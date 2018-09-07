@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+    <ItemGroup>
+      <PackageReference Include="NuGet.Build.Packaging" Version="0.2.2" />
+    </ItemGroup>
+    <Import Project="..\Plugin.FirebaseAuth.Shared\Plugin.FirebaseAuth.Shared.projitems" Label="Shared" Condition="Exists('..\Plugin.FirebaseAuth.Shared\Plugin.FirebaseAuth.Shared.projitems')" />
+</Project>

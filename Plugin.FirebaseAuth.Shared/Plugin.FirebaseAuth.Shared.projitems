@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>{1FC9A08C-ED9F-401D-AA2D-5B42063C8682}</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Plugin.FirebaseAuth</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CrossFirebaseAuth.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IFirebaseAuth.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IAuthResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IUser.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ActionCodeSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IAdditionalUserInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IAuthCredential.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IUserInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserProfileChangeRequest.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IPhoneAuthCredential.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IFacebookAuthProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IGoogleAuthProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ITwitterAuthProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IGitHubAuthProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IEmailAuthProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IPhoneAuthProvider.cs" />
+  </ItemGroup>
+</Project>

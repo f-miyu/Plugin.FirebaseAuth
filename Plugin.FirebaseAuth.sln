@@ -1,0 +1,37 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Plugin.FirebaseAuth.Shared", "Plugin.FirebaseAuth.Shared\Plugin.FirebaseAuth.Shared.shproj", "{1FC9A08C-ED9F-401D-AA2D-5B42063C8682}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.FirebaseAuth.iOS", "Plugin.FirebaseAuth.iOS\Plugin.FirebaseAuth.iOS.csproj", "{0B0B8720-8F3D-49A4-9D19-DAA20D76AB53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.FirebaseAuth.Android", "Plugin.FirebaseAuth.Android\Plugin.FirebaseAuth.Android.csproj", "{63819CB9-488A-4439-A16F-211402623C91}"
+EndProject
+Project("{5DD5E4FA-CB73-4610-85AB-557B54E96AA9}") = "Plugin.FirebaseAuth.NuGet", "Plugin.FirebaseAuth.NuGet\Plugin.FirebaseAuth.NuGet.nuproj", "{52E38BFA-D096-4F6A-A249-9E4BCFFADC55}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.FirebaseAuth", "Plugin.FirebaseAuth\Plugin.FirebaseAuth.csproj", "{763549DD-5329-41E9-8139-433B6CDA2687}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0B0B8720-8F3D-49A4-9D19-DAA20D76AB53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B0B8720-8F3D-49A4-9D19-DAA20D76AB53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B0B8720-8F3D-49A4-9D19-DAA20D76AB53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B0B8720-8F3D-49A4-9D19-DAA20D76AB53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63819CB9-488A-4439-A16F-211402623C91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63819CB9-488A-4439-A16F-211402623C91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63819CB9-488A-4439-A16F-211402623C91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63819CB9-488A-4439-A16F-211402623C91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52E38BFA-D096-4F6A-A249-9E4BCFFADC55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52E38BFA-D096-4F6A-A249-9E4BCFFADC55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52E38BFA-D096-4F6A-A249-9E4BCFFADC55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52E38BFA-D096-4F6A-A249-9E4BCFFADC55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{763549DD-5329-41E9-8139-433B6CDA2687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{763549DD-5329-41E9-8139-433B6CDA2687}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{763549DD-5329-41E9-8139-433B6CDA2687}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{763549DD-5329-41E9-8139-433B6CDA2687}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
