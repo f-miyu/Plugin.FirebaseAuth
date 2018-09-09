@@ -8,6 +8,9 @@ namespace Plugin.FirebaseAuth
 {
     public class FirebaseAuthImplementation : IFirebaseAuth
     {
+        public event EventHandler<UserEventArgs> AuthStateChanged;
+        public event EventHandler<UserEventArgs> IdTokenChanged;
+
         public IEmailAuthProvider EmailAuthProvider { get; } = new EmailAuthProviderWrapper();
 
         public IGoogleAuthProvider GoogleAuthProvider { get; } = new GoogleAuthProviderWrapper();
@@ -42,6 +45,25 @@ namespace Plugin.FirebaseAuth
 
         public FirebaseAuthImplementation()
         {
+            _instance.AddAuthStateDidChangeListener((auth, user) =>
+            {
+                IUser userWrapper = null;
+                if (user != null)
+                {
+                    userWrapper = new UserWrapper(user);
+                }
+                AuthStateChanged?.Invoke(this, new UserEventArgs(userWrapper));
+            });
+
+            _instance.AddIdTokenDidChangeListener((auth, user) =>
+            {
+                IUser userWrapper = null;
+                if (user != null)
+                {
+                    userWrapper = new UserWrapper(user);
+                }
+                IdTokenChanged?.Invoke(this, new UserEventArgs(userWrapper));
+            });
         }
 
         public async Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password)

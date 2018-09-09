@@ -1,11 +1,13 @@
 ﻿using System;
-using Firebase.Auth;
 using System.Threading.Tasks;
 using Firebase;
 namespace Plugin.FirebaseAuth
 {
     public class FirebaseAuthImplementation : IFirebaseAuth
     {
+        public event EventHandler<UserEventArgs> AuthStateChanged;
+        public event EventHandler<UserEventArgs> IdTokenChanged;
+
         public IEmailAuthProvider EmailAuthProvider { get; } = new EmailAuthProviderWrapper();
 
         public IGoogleAuthProvider GoogleAuthProvider { get; } = new GoogleAuthProviderWrapper();
@@ -40,7 +42,26 @@ namespace Plugin.FirebaseAuth
 
         public FirebaseAuthImplementation()
         {
+            _instance.AuthState += (object sender, Firebase.Auth.FirebaseAuth.AuthStateEventArgs e) =>
+            {
+                IUser user = null;
+                if (e.Auth.CurrentUser != null)
+                {
+                    user = new UserWrapper(e.Auth.CurrentUser);
+                }
 
+                AuthStateChanged?.Invoke(this, new UserEventArgs(user));
+            };
+
+            _instance.IdToken += (object sender, Firebase.Auth.FirebaseAuth.IdTokenEventArgs e) =>
+            {
+                IUser user = null;
+                if (e.Auth.CurrentUser != null)
+                {
+                    user = new UserWrapper(e.Auth.CurrentUser);
+                }
+                IdTokenChanged?.Invoke(this, new UserEventArgs(user));
+            };
         }
 
         public async Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password)

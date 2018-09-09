@@ -5,6 +5,8 @@ namespace Plugin.FirebaseAuth
 {
     public interface IFirebaseAuth
     {
+        event EventHandler<UserEventArgs> AuthStateChanged;
+        event EventHandler<UserEventArgs> IdTokenChanged;
         IEmailAuthProvider EmailAuthProvider { get; }
         IGoogleAuthProvider GoogleAuthProvider { get; }
         IFacebookAuthProvider FacebookAuthProvider { get; }

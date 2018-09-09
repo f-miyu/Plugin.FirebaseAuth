@@ -6,34 +6,39 @@ namespace Plugin.FirebaseAuth
 {
     public static class FirebaseAuth
     {
-        private static Func<Activity> _topActivityFactory;
+        private static ActivityLifecycleCallbacks _callbacks;
 
-        internal static Activity CurrentTopActivity => _topActivityFactory?.Invoke();
+        internal static Activity CurrentActivity => _callbacks.CurrentActivit;
 
         public static long VerifyingPhoneNumberTimeout { get; set; } = 60;
 
-        public static void Init(Func<Activity> topActivityFactory)
-        {
-            _topActivityFactory = topActivityFactory;
-        }
 
         public static void Init(Application application)
         {
-            var callbacks = new ActivityLifecycleCallbacks();
-            application.RegisterActivityLifecycleCallbacks(callbacks);
-            _topActivityFactory = () => callbacks.CurrentTopActivit;
+            if (_callbacks != null)
+                return;
+
+            _callbacks = new ActivityLifecycleCallbacks();
+            application.RegisterActivityLifecycleCallbacks(_callbacks);
         }
 
         public static void Init(Activity activity)
         {
-            var callbacks = new ActivityLifecycleCallbacks(activity);
-            activity.Application.RegisterActivityLifecycleCallbacks(callbacks);
-            _topActivityFactory = () => callbacks.CurrentTopActivit;
+            if (_callbacks != null)
+                return;
+
+            _callbacks = new ActivityLifecycleCallbacks(activity);
+            activity.Application.RegisterActivityLifecycleCallbacks(_callbacks);
         }
 
         private class ActivityLifecycleCallbacks : Java.Lang.Object, Application.IActivityLifecycleCallbacks
         {
-            public Activity CurrentTopActivit { get; private set; }
+            private WeakReference<Activity> _currentActivity = new WeakReference<Activity>(null);
+            public Activity CurrentActivit
+            {
+                get => _currentActivity.TryGetTarget(out var activity) ? activity : null;
+                set => _currentActivity.SetTarget(value);
+            }
 
             public ActivityLifecycleCallbacks()
             {
@@ -41,12 +46,12 @@ namespace Plugin.FirebaseAuth
 
             public ActivityLifecycleCallbacks(Activity activity)
             {
-                CurrentTopActivit = activity;
+                CurrentActivit = activity;
             }
 
             public void OnActivityCreated(Activity activity, Bundle savedInstanceState)
             {
-                CurrentTopActivit = activity;
+                CurrentActivit = activity;
             }
 
             public void OnActivityDestroyed(Activity activity)
@@ -59,7 +64,7 @@ namespace Plugin.FirebaseAuth
 
             public void OnActivityResumed(Activity activity)
             {
-                CurrentTopActivit = activity;
+                CurrentActivit = activity;
             }
 
             public void OnActivitySaveInstanceState(Activity activity, Bundle outState)

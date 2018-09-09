@@ -17,7 +17,7 @@ namespace Plugin.FirebaseAuth
             return new PhoneAuthCredentialWrapper(credential);
         }
 
-        public async Task<(IPhoneAuthCredential Credential, string VerificationCode)> VerifyPhoneNumberAsync(string phoneNumber, bool forceResend = false)
+        public async Task<(IPhoneAuthCredential Credential, string VerificationCode)> VerifyPhoneNumberAsync(string phoneNumber)
         {
             try
             {

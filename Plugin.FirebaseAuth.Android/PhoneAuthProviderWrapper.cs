@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Firebase;
 using Firebase.Auth;
 using Java.Util.Concurrent;
+using Android.App;
+using System.Diagnostics;
 
 namespace Plugin.FirebaseAuth
 {
@@ -10,47 +12,36 @@ namespace Plugin.FirebaseAuth
     {
         public string ProviderId => PhoneAuthProvider.ProviderId;
 
-        private PhoneAuthProvider.ForceResendingToken _forceResendingToken;
-
         public IPhoneAuthCredential GetCredential(string verificationId, string smsCode)
         {
             var credential = PhoneAuthProvider.GetCredential(verificationId, smsCode);
             return new PhoneAuthCredentialWrapper(credential);
         }
 
-        public async Task<(IPhoneAuthCredential Credential, string VerificationCode)> VerifyPhoneNumberAsync(string phoneNumber, bool forceResend = false)
+        public Task<(IPhoneAuthCredential Credential, string VerificationCode)> VerifyPhoneNumberAsync(string phoneNumber)
         {
-            var tcs = new TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationCode, PhoneAuthProvider.ForceResendingToken ForceResendingToken)>();
+            var activity = FirebaseAuth.CurrentActivity ?? throw new NullReferenceException("current activity is null");
+
+            var tcs = new TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationCode)>();
             var callbacks = new Callbacks(tcs);
 
-            if (forceResend && _forceResendingToken != null)
-            {
-                PhoneAuthProvider.Instance.VerifyPhoneNumber(phoneNumber, FirebaseAuth.VerifyingPhoneNumberTimeout, TimeUnit.Seconds, FirebaseAuth.CurrentTopActivity, callbacks, _forceResendingToken);
-            }
-            else
-            {
-                PhoneAuthProvider.Instance.VerifyPhoneNumber(phoneNumber, FirebaseAuth.VerifyingPhoneNumberTimeout, TimeUnit.Seconds, FirebaseAuth.CurrentTopActivity, callbacks);
-            }
+            PhoneAuthProvider.Instance.VerifyPhoneNumber(phoneNumber, FirebaseAuth.VerifyingPhoneNumberTimeout, TimeUnit.Seconds, activity, callbacks);
 
-            var (credential, verificationCode, forceResendingToken) = await tcs.Task.ConfigureAwait(false);
-
-            _forceResendingToken = forceResendingToken;
-
-            return (credential, verificationCode);
+            return tcs.Task;
         }
 
         private class Callbacks : PhoneAuthProvider.OnVerificationStateChangedCallbacks
         {
-            private TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationCode, PhoneAuthProvider.ForceResendingToken ForceResendingToken)> _tcs;
+            private TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationCode)> _tcs;
 
-            public Callbacks(TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationCode, PhoneAuthProvider.ForceResendingToken ForceResendingToken)> tcs)
+            public Callbacks(TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationCode)> tcs)
             {
                 _tcs = tcs;
             }
 
             public override void OnVerificationCompleted(PhoneAuthCredential credential)
             {
-                _tcs.SetResult((new PhoneAuthCredentialWrapper(credential), null, null));
+                _tcs.TrySetResult((new PhoneAuthCredentialWrapper(credential), null));
             }
 
             public override void OnVerificationFailed(FirebaseException exception)
@@ -62,14 +53,14 @@ namespace Plugin.FirebaseAuth
             {
                 base.OnCodeSent(verificationId, forceResendingToken);
 
-                _tcs.SetResult((null, verificationId, forceResendingToken));
+                _tcs.TrySetResult((null, verificationId));
             }
 
             public override void OnCodeAutoRetrievalTimeOut(string verificationId)
             {
                 base.OnCodeAutoRetrievalTimeOut(verificationId);
 
-                _tcs.SetResult((null, verificationId, null));
+                _tcs.TrySetResult((null, verificationId));
             }
         }
     }

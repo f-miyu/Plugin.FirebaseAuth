@@ -25,5 +25,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)IGitHubAuthProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IEmailAuthProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IPhoneAuthProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UserEventArgs.cs" />
   </ItemGroup>
 </Project>
