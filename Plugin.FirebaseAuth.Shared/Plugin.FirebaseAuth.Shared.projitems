@@ -26,5 +26,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)IEmailAuthProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IPhoneAuthProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)UserEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IListenerRegistration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ErrorType.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FirebaseAuthException.cs" />
   </ItemGroup>
 </Project>

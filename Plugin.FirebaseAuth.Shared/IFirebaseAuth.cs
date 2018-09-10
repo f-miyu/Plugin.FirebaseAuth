@@ -3,10 +3,11 @@ using System.Threading.Tasks;
 
 namespace Plugin.FirebaseAuth
 {
+    public delegate void AuthStateChangedHandler(IUser user);
+    public delegate void IdTokenChangedHandler(IUser user);
+
     public interface IFirebaseAuth
     {
-        event EventHandler<UserEventArgs> AuthStateChanged;
-        event EventHandler<UserEventArgs> IdTokenChanged;
         IEmailAuthProvider EmailAuthProvider { get; }
         IGoogleAuthProvider GoogleAuthProvider { get; }
         IFacebookAuthProvider FacebookAuthProvider { get; }
@@ -29,5 +30,7 @@ namespace Plugin.FirebaseAuth
         Task VerifyPasswordResetCodeAsync(string code);
         void SignOut();
         void UseAppLanguage();
+        IListenerRegistration AddAuthStateChangedListener(AuthStateChangedHandler listener);
+        IListenerRegistration AddIdTokenChangedListener(IdTokenChangedHandler listener);
     }
 }

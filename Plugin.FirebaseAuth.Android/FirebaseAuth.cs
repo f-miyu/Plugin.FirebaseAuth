@@ -1,17 +1,23 @@
 ﻿using System;
 using Android.App;
 using Android.OS;
+using Firebase.Auth;
 
 namespace Plugin.FirebaseAuth
 {
     public static class FirebaseAuth
     {
+        private static Func<Activity> _currentActivityFactory;
         private static ActivityLifecycleCallbacks _callbacks;
 
-        internal static Activity CurrentActivity => _callbacks.CurrentActivit;
+        internal static Activity CurrentActivity => _currentActivityFactory?.Invoke();
 
         public static long VerifyingPhoneNumberTimeout { get; set; } = 60;
 
+        public static void Init(Func<Activity> currentActivityFactory)
+        {
+            _currentActivityFactory = currentActivityFactory;
+        }
 
         public static void Init(Application application)
         {
@@ -20,6 +26,7 @@ namespace Plugin.FirebaseAuth
 
             _callbacks = new ActivityLifecycleCallbacks();
             application.RegisterActivityLifecycleCallbacks(_callbacks);
+            _currentActivityFactory = () => _callbacks.CurrentActivit;
         }
 
         public static void Init(Activity activity)
@@ -29,6 +36,7 @@ namespace Plugin.FirebaseAuth
 
             _callbacks = new ActivityLifecycleCallbacks(activity);
             activity.Application.RegisterActivityLifecycleCallbacks(_callbacks);
+            _currentActivityFactory = () => _callbacks.CurrentActivit;
         }
 
         private class ActivityLifecycleCallbacks : Java.Lang.Object, Application.IActivityLifecycleCallbacks

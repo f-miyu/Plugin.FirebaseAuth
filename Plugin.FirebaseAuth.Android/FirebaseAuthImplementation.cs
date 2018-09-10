@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Firebase;
+
 namespace Plugin.FirebaseAuth
 {
     public class FirebaseAuthImplementation : IFirebaseAuth
     {
-        public event EventHandler<UserEventArgs> AuthStateChanged;
-        public event EventHandler<UserEventArgs> IdTokenChanged;
-
         public IEmailAuthProvider EmailAuthProvider { get; } = new EmailAuthProviderWrapper();
 
         public IGoogleAuthProvider GoogleAuthProvider { get; } = new GoogleAuthProviderWrapper();
@@ -39,30 +37,6 @@ namespace Plugin.FirebaseAuth
         }
 
         private readonly Firebase.Auth.FirebaseAuth _instance = Firebase.Auth.FirebaseAuth.Instance;
-
-        public FirebaseAuthImplementation()
-        {
-            _instance.AuthState += (object sender, Firebase.Auth.FirebaseAuth.AuthStateEventArgs e) =>
-            {
-                IUser user = null;
-                if (e.Auth.CurrentUser != null)
-                {
-                    user = new UserWrapper(e.Auth.CurrentUser);
-                }
-
-                AuthStateChanged?.Invoke(this, new UserEventArgs(user));
-            };
-
-            _instance.IdToken += (object sender, Firebase.Auth.FirebaseAuth.IdTokenEventArgs e) =>
-            {
-                IUser user = null;
-                if (e.Auth.CurrentUser != null)
-                {
-                    user = new UserWrapper(e.Auth.CurrentUser);
-                }
-                IdTokenChanged?.Invoke(this, new UserEventArgs(user));
-            };
-        }
 
         public async Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password)
         {
@@ -250,6 +224,100 @@ namespace Plugin.FirebaseAuth
         public void UseAppLanguage()
         {
             _instance.UseAppLanguage();
+        }
+
+        public IListenerRegistration AddAuthStateChangedListener(AuthStateChangedHandler listener)
+        {
+            return new AuthStateChangedListenerRegistration(_instance, listener);
+        }
+
+        public IListenerRegistration AddIdTokenChangedListener(IdTokenChangedHandler listener)
+        {
+            return new IdTokenChangedListenerRegistration(_instance, listener);
+        }
+
+        private class AuthStateChangedListenerRegistration : IListenerRegistration
+        {
+            private readonly Firebase.Auth.FirebaseAuth _instance;
+            private Firebase.Auth.FirebaseAuth.IAuthStateListener _listener;
+
+            public AuthStateChangedListenerRegistration(Firebase.Auth.FirebaseAuth instance, AuthStateChangedHandler handler)
+            {
+                _instance = instance;
+                _listener = new AuthStateListener(handler);
+                _instance.AddAuthStateListener(_listener);
+            }
+
+            public void Remove()
+            {
+                if (_listener != null)
+                {
+                    _instance.RemoveAuthStateListener(_listener);
+                    _listener = null;
+                }
+            }
+
+            private class AuthStateListener : Java.Lang.Object, Firebase.Auth.FirebaseAuth.IAuthStateListener
+            {
+                private readonly AuthStateChangedHandler _handler;
+
+                public AuthStateListener(AuthStateChangedHandler handler)
+                {
+                    _handler = handler;
+                }
+
+                public void OnAuthStateChanged(Firebase.Auth.FirebaseAuth auth)
+                {
+                    IUser user = null;
+                    if (auth.CurrentUser != null)
+                    {
+                        user = new UserWrapper(auth.CurrentUser);
+                    }
+                    _handler?.Invoke(user);
+                }
+            }
+        }
+
+        private class IdTokenChangedListenerRegistration : IListenerRegistration
+        {
+            private readonly Firebase.Auth.FirebaseAuth _instance;
+            private Firebase.Auth.FirebaseAuth.IIdTokenListener _listener;
+
+            public IdTokenChangedListenerRegistration(Firebase.Auth.FirebaseAuth instance, IdTokenChangedHandler handler)
+            {
+                _instance = instance;
+                _listener = new IdTokenListener(handler);
+                _instance.AddIdTokenListener(_listener);
+            }
+
+            public void Remove()
+            {
+                if (_listener != null)
+                {
+                    _instance.RemoveIdTokenListener(_listener);
+                    _listener = null;
+                }
+            }
+
+            private class IdTokenListener : Java.Lang.Object, Firebase.Auth.FirebaseAuth.IIdTokenListener
+            {
+                private readonly IdTokenChangedHandler _handler;
+
+                public IdTokenListener(IdTokenChangedHandler handler)
+                {
+                    _handler = handler;
+                }
+
+                public void OnIdTokenChanged(Firebase.Auth.FirebaseAuth auth)
+                {
+                    IUser user = null;
+                    if (auth.CurrentUser != null)
+                    {
+                        user = new UserWrapper(auth.CurrentUser);
+                    }
+                    _handler?.Invoke(user);
+                }
+            }
         }
     }
 }

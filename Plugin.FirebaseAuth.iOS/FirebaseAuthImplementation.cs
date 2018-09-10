@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Firebase.Auth;
-using AudioUnit;
 using Foundation;
 
 namespace Plugin.FirebaseAuth
 {
     public class FirebaseAuthImplementation : IFirebaseAuth
     {
-        public event EventHandler<UserEventArgs> AuthStateChanged;
-        public event EventHandler<UserEventArgs> IdTokenChanged;
-
         public IEmailAuthProvider EmailAuthProvider { get; } = new EmailAuthProviderWrapper();
 
         public IGoogleAuthProvider GoogleAuthProvider { get; } = new GoogleAuthProviderWrapper();
@@ -43,28 +39,6 @@ namespace Plugin.FirebaseAuth
 
         private readonly Auth _instance = Auth.DefaultInstance;
 
-        public FirebaseAuthImplementation()
-        {
-            _instance.AddAuthStateDidChangeListener((auth, user) =>
-            {
-                IUser userWrapper = null;
-                if (user != null)
-                {
-                    userWrapper = new UserWrapper(user);
-                }
-                AuthStateChanged?.Invoke(this, new UserEventArgs(userWrapper));
-            });
-
-            _instance.AddIdTokenDidChangeListener((auth, user) =>
-            {
-                IUser userWrapper = null;
-                if (user != null)
-                {
-                    userWrapper = new UserWrapper(user);
-                }
-                IdTokenChanged?.Invoke(this, new UserEventArgs(userWrapper));
-            });
-        }
 
         public async Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password)
         {
@@ -250,6 +224,74 @@ namespace Plugin.FirebaseAuth
         public void UseAppLanguage()
         {
             _instance.UseAppLanguage();
+        }
+
+        public IListenerRegistration AddAuthStateChangedListener(AuthStateChangedHandler listener)
+        {
+            return new AuthStateChangedListenerRegistration(_instance, listener);
+        }
+
+        public IListenerRegistration AddIdTokenChangedListener(IdTokenChangedHandler listener)
+        {
+            return new IdTokenChangedListenerRegistration(_instance, listener);
+        }
+
+        private class AuthStateChangedListenerRegistration : IListenerRegistration
+        {
+            private readonly Auth _instance;
+            private NSObject _listner;
+
+            public AuthStateChangedListenerRegistration(Auth instance, AuthStateChangedHandler handler)
+            {
+                _instance = instance;
+                _listner = _instance.AddAuthStateDidChangeListener((Auth auth, User user) =>
+                {
+                    IUser userWrapper = null;
+                    if (user != null)
+                    {
+                        userWrapper = new UserWrapper(user);
+                    }
+                    handler?.Invoke(userWrapper);
+                });
+            }
+
+            public void Remove()
+            {
+                if (_listner != null)
+                {
+                    _instance.RemoveAuthStateDidChangeListener(_listner);
+                    _listner = null;
+                }
+            }
+        }
+
+        private class IdTokenChangedListenerRegistration : IListenerRegistration
+        {
+            private readonly Auth _instance;
+            private NSObject _listner;
+
+            public IdTokenChangedListenerRegistration(Auth instance, IdTokenChangedHandler handler)
+            {
+                _instance = instance;
+                _listner = _instance.AddIdTokenDidChangeListener((Auth auth, User user) =>
+                {
+                    IUser userWrapper = null;
+                    if (user != null)
+                    {
+                        userWrapper = new UserWrapper(user);
+                    }
+                    handler?.Invoke(userWrapper);
+                });
+            }
+
+            public void Remove()
+            {
+                if (_listner != null)
+                {
+                    _instance.RemoveIdTokenDidChangeListener(_listner);
+                    _listner = null;
+                }
+            }
         }
     }
 }
