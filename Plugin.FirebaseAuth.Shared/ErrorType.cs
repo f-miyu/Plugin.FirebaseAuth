@@ -7,7 +7,6 @@ namespace Plugin.FirebaseAuth
         NetWork,
         Email,
         ActionCode,
-        ApiNotAvailable,
         InvalidUser,
         TooManyRequests,
         WeakPassword,

@@ -13,9 +13,6 @@ namespace Plugin.FirebaseAuth
                 case FirebaseNetworkException firebaseNetworkException:
                     errorType = ErrorType.NetWork;
                     break;
-                case FirebaseApiNotAvailableException firebaseApiNotAvailableException:
-                    errorType = ErrorType.ApiNotAvailable;
-                    break;
                 case FirebaseTooManyRequestsException firebaseTooManyRequestsException:
                     errorType = ErrorType.TooManyRequests;
                     break;
@@ -39,9 +36,6 @@ namespace Plugin.FirebaseAuth
                     break;
                 case FirebaseAuthInvalidCredentialsException firebaseAuthInvalidCredentialsException:
                     errorType = ErrorType.InvalidCredentials;
-                    break;
-                case Firebase.Auth.FirebaseAuthException firebaseAuthException:
-                    errorType = ErrorType.Auth;
                     break;
             }
 

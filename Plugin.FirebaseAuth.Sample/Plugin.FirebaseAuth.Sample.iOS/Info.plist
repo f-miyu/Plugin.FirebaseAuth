@@ -50,5 +50,14 @@
 	<string>LaunchScreen</string>
 	<key>CFBundleName</key>
 	<string>Plugin.FirebaseAuth.Sample</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.62192275025-h6fgrb0pu1ob7r5qo24h36on0nlo2pjs</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
