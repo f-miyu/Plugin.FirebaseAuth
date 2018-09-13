@@ -8,12 +8,21 @@
     <PackageReference Include="Xamarin.Forms" Version="3.1.0.697729" />
     <PackageReference Include="Prism.DryIoc.Forms" Version="7.0.0.396" />
     <PackageReference Include="ReactiveProperty" Version="5.2.0" />
+    <PackageReference Include="Xamarin.Auth" Version="1.6.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Plugin.FirebaseAuth\Plugin.FirebaseAuth.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Services\" />
+    <Folder Include="Extensins\" />
+    <Folder Include="Auth\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="ViewModels\TwitterAuthPageViewModel.cs" />
+    <Compile Remove="Views\TwitterAuthPage.xaml.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="Views\TwitterAuthPage.xaml" />
   </ItemGroup>
 </Project>

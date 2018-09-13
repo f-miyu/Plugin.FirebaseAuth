@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="Plugin.FirebaseAuth.Sample.Views.MainPage" Title="{Binding Title}">
     <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
-        <Button Text="login" Command="{Binding LoginCommand}" />
+        <Button Text="Google Login" Command="{Binding GoogleLoginCommand}" />
+        <Button Text="Twitter Login" Command="{Binding TwitterLoginCommand}" />
+        <Button Text="Facebook Login" Command="{Binding FacebookLoginCommand}" />
+        <Button Text="GitHub Login" Command="{Binding GitHubLoginCommand}" />
     </StackLayout>
 </ContentPage>

@@ -6,14 +6,21 @@ using Prism.Ioc;
 using Android.Widget;
 using Android.Content;
 using System;
+using Plugin.FirebaseAuth.Sample.Auth;
+using Xamarin.Auth;
 
 namespace Plugin.FirebaseAuth.Sample.Droid
 {
-    [Activity(Label = "Plugin.FirebaseAuth.Sample", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [Activity(Label = "Plugin.FirebaseAuth.Sample", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = true,
+              LaunchMode = LaunchMode.SingleTop,
+              ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
+    [IntentFilter(
+        new[] { Intent.ActionView },
+        Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
+        DataSchemes = new[] { Constants.GoogleAndroidUrlScheme, Constants.FacebookUrlScheme, Constants.UrlScheme },
+        DataPaths = new[] { "/oauth2redirect" })]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
-        public event EventHandler<ActivityResultEventArgs> ActivityResultCalled;
-
         protected override void OnCreate(Bundle bundle)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
@@ -23,15 +30,22 @@ namespace Plugin.FirebaseAuth.Sample.Droid
 
             FirebaseAuth.Init(this);
 
+            Xamarin.Auth.Presenters.XamarinAndroid.AuthenticationConfiguration.Init(this, bundle);
+            CustomTabsConfiguration.CustomTabsClosingMessage = null;
+
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App(new AndroidInitializer()));
         }
 
-        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        protected override void OnNewIntent(Intent intent)
         {
-            base.OnActivityResult(requestCode, resultCode, data);
+            base.OnNewIntent(intent);
 
-
+            if (intent.Data != null)
+            {
+                var uri = new Uri(intent.Data.ToString());
+                AuthenticationState.Authenticator.OnPageLoaded(uri);
+            }
         }
     }
 

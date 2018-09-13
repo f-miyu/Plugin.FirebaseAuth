@@ -8,8 +8,10 @@ using Prism.AppModel;
 
 namespace Plugin.FirebaseAuth.Sample.ViewModels
 {
-    public class ViewModelBase : BindableBase, INavigationAware, IDestructible, IPageLifecycleAware
+    public abstract class ViewModelBase : BindableBase, INavigationAware, IDestructible, IPageLifecycleAware
     {
+        public static readonly string ParameterKey = "parameter";
+
         protected INavigationService NavigationService { get; private set; }
 
         private string _title;
@@ -19,7 +21,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
             set { SetProperty(ref _title, value); }
         }
 
-        public ViewModelBase(INavigationService navigationService)
+        protected ViewModelBase(INavigationService navigationService)
         {
             NavigationService = navigationService;
         }
@@ -51,5 +53,23 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         public virtual void OnDisappearing()
         {
         }
+    }
+
+    public abstract class ViewModelBase<TParameer> : ViewModelBase
+    {
+        protected ViewModelBase(INavigationService navigationService) : base(navigationService)
+        {
+        }
+
+        public override void OnNavigatingTo(NavigationParameters parameters)
+        {
+            base.OnNavigatingTo(parameters);
+
+            var parameter = (TParameer)parameters[ParameterKey];
+
+            Prepare(parameter);
+        }
+
+        public abstract void Prepare(TParameer parameer);
     }
 }

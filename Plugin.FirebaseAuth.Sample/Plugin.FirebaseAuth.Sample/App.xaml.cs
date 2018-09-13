@@ -5,6 +5,8 @@ using Plugin.FirebaseAuth.Sample.Views;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using Prism.DryIoc;
+using System.Reflection;
+using System.Linq;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace Plugin.FirebaseAuth.Sample
