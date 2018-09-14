@@ -17,13 +17,13 @@ namespace Plugin.FirebaseAuth
             return new PhoneAuthCredentialWrapper(credential);
         }
 
-        public async Task<(IPhoneAuthCredential Credential, string VerificationCode)> VerifyPhoneNumberAsync(string phoneNumber)
+        public async Task<(IPhoneAuthCredential Credential, string VerificationId)> VerifyPhoneNumberAsync(string phoneNumber)
         {
             try
             {
-                var verificationCode = await PhoneAuthProvider.DefaultInstance.VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
+                var verificationId = await PhoneAuthProvider.DefaultInstance.VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
                                                               .ConfigureAwait(false);
-                return (null, verificationCode);
+                return (null, verificationId);
             }
             catch (NSErrorException e)
             {

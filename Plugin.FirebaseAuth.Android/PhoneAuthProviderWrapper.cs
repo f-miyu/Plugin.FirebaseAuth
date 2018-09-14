@@ -18,11 +18,11 @@ namespace Plugin.FirebaseAuth
             return new PhoneAuthCredentialWrapper(credential);
         }
 
-        public Task<(IPhoneAuthCredential Credential, string VerificationCode)> VerifyPhoneNumberAsync(string phoneNumber)
+        public Task<(IPhoneAuthCredential Credential, string VerificationId)> VerifyPhoneNumberAsync(string phoneNumber)
         {
             var activity = FirebaseAuth.CurrentActivity ?? throw new NullReferenceException("current activity is null");
 
-            var tcs = new TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationCode)>();
+            var tcs = new TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationId)>();
             var callbacks = new Callbacks(tcs);
 
             PhoneAuthProvider.Instance.VerifyPhoneNumber(phoneNumber, FirebaseAuth.VerifyingPhoneNumberTimeout, TimeUnit.Seconds, activity, callbacks);
@@ -32,9 +32,9 @@ namespace Plugin.FirebaseAuth
 
         private class Callbacks : PhoneAuthProvider.OnVerificationStateChangedCallbacks
         {
-            private TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationCode)> _tcs;
+            private TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationId)> _tcs;
 
-            public Callbacks(TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationCode)> tcs)
+            public Callbacks(TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationId)> tcs)
             {
                 _tcs = tcs;
             }

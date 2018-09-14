@@ -24,5 +24,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Remove="Views\TwitterAuthPage.xaml" />
+    <EmbeddedResource Remove="ViewModels\VerificationCodePage.xaml" />
   </ItemGroup>
 </Project>

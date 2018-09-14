@@ -5,5 +5,6 @@
         <Button Text="Twitter Login" Command="{Binding TwitterLoginCommand}" />
         <Button Text="Facebook Login" Command="{Binding FacebookLoginCommand}" />
         <Button Text="GitHub Login" Command="{Binding GitHubLoginCommand}" />
+        <Button Text="Phone Number Login" Command="{Binding PhoneNumberLoginCommand}" />
     </StackLayout>
 </ContentPage>

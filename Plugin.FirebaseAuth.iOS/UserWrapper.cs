@@ -56,11 +56,11 @@ namespace Plugin.FirebaseAuth
 
         public bool IsEmailVerified => User.IsEmailVerified;
 
-        public Task DeleteAsync()
+        public async Task DeleteAsync()
         {
             try
             {
-                return User.DeleteAsync();
+                await User.DeleteAsync().ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -68,11 +68,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task<string> GetIdTokenAsync(bool forceRefresh)
+        public async Task<string> GetIdTokenAsync(bool forceRefresh)
         {
             try
             {
-                return User.GetIdTokenAsync(forceRefresh);
+                return await User.GetIdTokenAsync(forceRefresh).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -80,12 +80,13 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task LinkWithCredentialAsync(IAuthCredential credential)
+        public async Task<IAuthResult> LinkWithCredentialAsync(IAuthCredential credential)
         {
             try
             {
                 var wrapper = (AuthCredentialWrapper)credential;
-                return User.LinkAndRetrieveDataAsync(wrapper.AuthCredential);
+                var result = await User.LinkAndRetrieveDataAsync(wrapper.AuthCredential).ConfigureAwait(false);
+                return new AuthResultWrapper(result);
             }
             catch (NSErrorException e)
             {
@@ -107,11 +108,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task ReloadAsync()
+        public async Task ReloadAsync()
         {
             try
             {
-                return User.ReloadAsync();
+                await User.ReloadAsync().ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -132,11 +133,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task UpdateEmailAsync(string email)
+        public async Task UpdateEmailAsync(string email)
         {
             try
             {
-                return User.UpdateEmailAsync(email);
+                await User.UpdateEmailAsync(email).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -144,11 +145,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task UpdatePasswordAsync(string password)
+        public async Task UpdatePasswordAsync(string password)
         {
             try
             {
-                return User.UpdatePasswordAsync(password);
+                await User.UpdatePasswordAsync(password).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -156,12 +157,12 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task UpdatePhoneNumberAsync(IPhoneAuthCredential credential)
+        public async Task UpdatePhoneNumberAsync(IPhoneAuthCredential credential)
         {
             try
             {
                 var wrapper = (PhoneAuthCredentialWrapper)credential;
-                return User.UpdatePhoneNumberCredentialAsync(wrapper.PhoneAuthCredential);
+                await User.UpdatePhoneNumberCredentialAsync(wrapper.PhoneAuthCredential).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -169,7 +170,7 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task UpdateProfileAsync(UserProfileChangeRequest request)
+        public async Task UpdateProfileAsync(UserProfileChangeRequest request)
         {
             try
             {
@@ -183,7 +184,7 @@ namespace Plugin.FirebaseAuth
                     userProfileChangeRequest.PhotoUrl = request.PhtoUrl;
                 }
 
-                return userProfileChangeRequest.CommitChangesAsync();
+                await userProfileChangeRequest.CommitChangesAsync().ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {

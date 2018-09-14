@@ -104,11 +104,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task FetchProvidersForEmailAsync(string email)
+        public async Task FetchProvidersForEmailAsync(string email)
         {
             try
             {
-                return _instance.FetchProvidersForEmailAsync(email);
+                await _instance.FetchProvidersForEmailAsync(email).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -116,11 +116,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task SendPasswordResetEmailAsync(string email)
+        public async Task SendPasswordResetEmailAsync(string email)
         {
             try
             {
-                return _instance.SendPasswordResetEmailAsync(email);
+                await _instance.SendPasswordResetEmailAsync(email).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -128,7 +128,7 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task SendPasswordResetEmailAsync(string email, ActionCodeSettings settings)
+        public async Task SendPasswordResetEmailAsync(string email, ActionCodeSettings settings)
         {
             try
             {
@@ -153,7 +153,7 @@ namespace Plugin.FirebaseAuth
                     builder.SetHandleCodeInApp(settings.HandleCodeInApp);
                 }
 
-                return _instance.SendPasswordResetEmailAsync(email, builder.Build());
+                await _instance.SendPasswordResetEmailAsync(email, builder.Build()).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -161,11 +161,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task ApplyActionCodeAsync(string code)
+        public async Task ApplyActionCodeAsync(string code)
         {
             try
             {
-                return _instance.ApplyActionCodeAsync(code);
+                await _instance.ApplyActionCodeAsync(code).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -173,11 +173,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task CheckActionCodeAsync(string code)
+        public async Task CheckActionCodeAsync(string code)
         {
             try
             {
-                return _instance.CheckActionCodeAsync(code);
+                await _instance.CheckActionCodeAsync(code).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -185,11 +185,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task ConfirmPasswordResetAsync(string email, string newPassword)
+        public async Task ConfirmPasswordResetAsync(string email, string newPassword)
         {
             try
             {
-                return _instance.ConfirmPasswordResetAsync(email, newPassword);
+                await _instance.ConfirmPasswordResetAsync(email, newPassword).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -197,11 +197,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task VerifyPasswordResetCodeAsync(string code)
+        public async Task VerifyPasswordResetCodeAsync(string code)
         {
             try
             {
-                return _instance.VerifyPasswordResetCodeAsync(code);
+                await _instance.VerifyPasswordResetCodeAsync(code).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {

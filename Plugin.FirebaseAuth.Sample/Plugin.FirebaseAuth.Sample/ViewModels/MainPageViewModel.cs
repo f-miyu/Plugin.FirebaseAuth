@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Plugin.FirebaseAuth.Sample.Auth;
 using Prism.Services;
 using DryIoc;
+using Plugin.FirebaseAuth.Sample.Extensins;
 
 namespace Plugin.FirebaseAuth.Sample.ViewModels
 {
@@ -21,6 +22,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         public AsyncReactiveCommand TwitterLoginCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand FacebookLoginCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand GitHubLoginCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand PhoneNumberLoginCommand { get; } = new AsyncReactiveCommand();
 
         private readonly IPageDialogService _pageDialogService;
 
@@ -35,6 +37,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
             TwitterLoginCommand.Subscribe(LoginWithTwitter);
             FacebookLoginCommand.Subscribe(LoginWithFacebook);
             GitHubLoginCommand.Subscribe(LoginWithGitHub);
+            PhoneNumberLoginCommand.Subscribe(LoginWithPhoneNumber);
         }
 
         private async Task LoginWithGoogle()
@@ -50,11 +53,11 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 {
                     case Device.iOS:
                         clientId = Constants.GoogleIosClientId;
-                        redirectUri = Constants.GoogleIosUrlScheme + ":/oauth2redirect";
+                        redirectUri = Constants.GoogleIosRedirectUrl;
                         break;
                     case Device.Android:
                         clientId = Constants.GoogleAndroidClientId;
-                        redirectUri = Constants.GoogleAndroidUrlScheme + ":/oauth2redirect";
+                        redirectUri = Constants.GoogleAndroidRedirectUrl;
                         break;
                 }
 
@@ -126,7 +129,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                                                                   new Uri("https://api.twitter.com/oauth/request_token"),
                                                                   new Uri("https://api.twitter.com/oauth/authorize"),
                                                                   new Uri("https://api.twitter.com/oauth/access_token"),
-                                                                  new Uri(Constants.UrlScheme + "://"),
+                                                                  new Uri(Constants.TwitterRedirectUrl),
                                                                   null,
                                                                   true);
 
@@ -185,10 +188,9 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 var tcs = new TaskCompletionSource<string>();
 
                 var authenticator = new CustomOAuth2Authenticator(Constants.FacebookClientId,
-
                                                                   null,
-                                                                  new Uri("https://m.facebook.com/dialog/oauth/"),
-                                                                  new Uri(Constants.FacebookUrlScheme + "://authorize"),
+                                                                  new Uri("https://m.facebook.com/dialog/oauth"),
+                                                                  new Uri(Constants.FacebookRedirectUrl),
                                                                   null,
                                                                   true);
 
@@ -214,7 +216,6 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 AuthenticationState.Authenticator = authenticator;
 
                 var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-
                 presenter.Login(authenticator);
 
                 var accessToken = await tcs.Task.ConfigureAwait(false);
@@ -249,9 +250,9 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
                 var authenticator = new CustomOAuth2Authenticator(Constants.GitHubClientId,
                                                                   Constants.GitHubClientSecret,
-                                                                  null,
+                                                                  "user",
                                                                   new Uri("https://github.com/login/oauth/authorize"),
-                                                                  new Uri(Constants.UrlScheme + "://authorize"),
+                                                                  new Uri(Constants.GitHubRedirectUrl),
                                                                   new Uri("https://github.com/login/oauth/access_token"),
                                                                   null,
                                                                   true);
@@ -278,7 +279,6 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 AuthenticationState.Authenticator = authenticator;
 
                 var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-
                 presenter.Login(authenticator);
 
                 var token = await tcs.Task.ConfigureAwait(false);
@@ -286,6 +286,8 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 var credential = CrossFirebaseAuth.Current
                                                   .GitHubAuthProvider
                                                   .GetCredential(token);
+
+                var user = CrossFirebaseAuth.Current.CurrentUser;
 
                 var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential).ConfigureAwait(false);
 
@@ -301,6 +303,33 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 Device.BeginInvokeOnMainThread(() =>
                 {
                     _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
+                });
+            }
+        }
+
+        private async Task LoginWithPhoneNumber()
+        {
+            var (result, exception) = await NavigationService.NavigateAsync<LoginWithPhoneNumberPageViewModel, (IAuthResult Result, Exception Exception)>();
+
+            if (exception != null)
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    _pageDialogService.DisplayAlertAsync("Failure", exception.Message, "OK");
+                });
+            }
+            else if (result != null)
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+                });
+            }
+            else
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    _pageDialogService.DisplayAlertAsync("Failure", "Canceled", "OK");
                 });
             }
         }

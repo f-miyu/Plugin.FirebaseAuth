@@ -33,6 +33,8 @@ namespace Plugin.FirebaseAuth.Sample
         {
             containerRegistry.RegisterForNavigation<NavigationPage>();
             containerRegistry.RegisterForNavigation<MainPage>();
+            containerRegistry.RegisterForNavigation<LoginWithPhoneNumberPage>();
+            containerRegistry.RegisterForNavigation<VerificationCodePage>();
         }
     }
 }

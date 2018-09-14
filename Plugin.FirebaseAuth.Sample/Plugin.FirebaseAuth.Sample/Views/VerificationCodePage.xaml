@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             x:Class="Plugin.FirebaseAuth.Sample.Views.VerificationCodePage"
+             Title="{Binding Title}">
+    <StackLayout HorizontalOptions="FillAndExpand" Padding="8,0">
+        <Label Text="Verification Code:" />
+        <Entry Text="{Binding VerificationCode.Value}" Keyboard="Numeric"/>
+        <Button Text="OK" Command="{Binding OKCommand}" />
+        <Button Text="Cancel" Command="{Binding CancelCommand}" />
+    </StackLayout>
+</ContentPage>

@@ -2,13 +2,11 @@
 using Firebase.Auth;
 namespace Plugin.FirebaseAuth
 {
-    public class PhoneAuthCredentialWrapper : IPhoneAuthCredential
+    public class PhoneAuthCredentialWrapper : AuthCredentialWrapper, IPhoneAuthCredential
     {
         internal PhoneAuthCredential PhoneAuthCredential { get; }
 
-        public string Provider => PhoneAuthCredential.Provider;
-
-        public PhoneAuthCredentialWrapper(PhoneAuthCredential phoneAuthCredential)
+        public PhoneAuthCredentialWrapper(PhoneAuthCredential phoneAuthCredential) : base(phoneAuthCredential)
         {
             PhoneAuthCredential = phoneAuthCredential;
         }

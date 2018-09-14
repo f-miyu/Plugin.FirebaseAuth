@@ -6,6 +6,6 @@ namespace Plugin.FirebaseAuth
     {
         string ProviderId { get; }
         IPhoneAuthCredential GetCredential(string verificationId, string verificationCode);
-        Task<(IPhoneAuthCredential Credential, string VerificationCode)> VerifyPhoneNumberAsync(string phoneNumber);
+        Task<(IPhoneAuthCredential Credential, string VerificationId)> VerifyPhoneNumberAsync(string phoneNumber);
     }
 }

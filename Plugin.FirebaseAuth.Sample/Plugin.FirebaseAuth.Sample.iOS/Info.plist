@@ -57,28 +57,22 @@
 			<array>
 				<string>com.googleusercontent.apps.62192275025-h6fgrb0pu1ob7r5qo24h36on0nlo2pjs</string>
 			</array>
-			<key>CFBundleURLTypes</key>
-			<string>Viewer</string>
 			<key>CFBundleURLName</key>
 			<string>Google OAuth</string>
 		</dict>
 		<dict>
-			<key>CFBundleURLTypes</key>
-			<string>Viewer</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.plugin.firebaseauth.sample</string>
+				<string>firebase-auth-sample</string>
 			</array>
 			<key>CFBundleURLName</key>
-			<string>OAuth</string>
+			<string></string>
 		</dict>
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>fb293961301195586</string>
 			</array>
-			<key>CFBundleURLTypes</key>
-			<string>Viewer</string>
 			<key>CFBundleURLName</key>
 			<string>Facebook OAuth</string>
 		</dict>
