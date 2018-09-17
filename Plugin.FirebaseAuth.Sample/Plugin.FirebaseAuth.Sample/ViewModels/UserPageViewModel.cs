@@ -32,6 +32,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         public AsyncReactiveCommand LinkOrUnlinkWithTwitterCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand LinkOrUnlinkWithFacebookCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand LinkOrUnlinkWithGitHubCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand DeleteCommand { get; } = new AsyncReactiveCommand();
 
         private readonly IPageDialogService _pageDialogService;
         private readonly IAuthService _authService;
@@ -90,6 +91,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
             LinkOrUnlinkWithTwitterCommand.Subscribe(() => IsLinkedWithTwitter.Value ? UnlinkWithTwitter() : LinkWithTwitter());
             LinkOrUnlinkWithFacebookCommand.Subscribe(() => IsLinkedWithFacebook.Value ? UnlinkWithFacebook() : LinkWithFacebook());
             LinkOrUnlinkWithGitHubCommand.Subscribe(() => IsLinkedWithGitHub.Value ? UnlinkWithGitHub() : LinkWithGitHub());
+            DeleteCommand.Subscribe(Delete);
         }
 
         private async Task UpdateName()
@@ -137,13 +139,12 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
             try
             {
-                var (credential, verificationId) = await CrossFirebaseAuth.Current
-                                                                              .PhoneAuthProvider
-                                                                              .VerifyPhoneNumberAsync(PhoneNumber.Value);
+                var verificationResult = await CrossFirebaseAuth.Current.PhoneAuthProvider
+                                                                .VerifyPhoneNumberAsync(PhoneNumber.Value);
 
-                if (credential != null)
+                if (verificationResult.Credential != null)
                 {
-                    await user.UpdatePhoneNumberAsync(credential);
+                    await user.UpdatePhoneNumberAsync(verificationResult.Credential);
 
                     await _pageDialogService.DisplayAlertAsync("Success", null, "OK");
                 }
@@ -153,7 +154,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
                     if (verificationCode != null)
                     {
-                        credential = CrossFirebaseAuth.Current.PhoneAuthProvider.GetCredential(verificationId, verificationCode);
+                        var credential = CrossFirebaseAuth.Current.PhoneAuthProvider.GetCredential(verificationResult.VerificationId, verificationCode);
 
                         await user.UpdatePhoneNumberAsync(credential);
 
@@ -380,6 +381,27 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 _user.Value = result;
 
                 await _pageDialogService.DisplayAlertAsync("Success", result.DisplayName, "OK");
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+
+                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
+            }
+        }
+
+        private async Task Delete()
+        {
+            var user = _user.Value;
+            if (user == null) return;
+
+            try
+            {
+                await user.DeleteAsync();
+
+                await _pageDialogService.DisplayAlertAsync("Success", null, "OK");
+
+                await NavigationService.GoBackAsync();
             }
             catch (Exception e)
             {

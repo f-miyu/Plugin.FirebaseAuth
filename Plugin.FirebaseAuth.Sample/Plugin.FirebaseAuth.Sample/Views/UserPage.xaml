@@ -60,6 +60,7 @@
                 </Button.Text>
             </Button>
             <Button Text="Sign out" Command="{Binding SignOutCommand}"  HorizontalOptions="Center" />
+            <Button Text="Delete" Command="{Binding DeleteCommand}"  HorizontalOptions="Center" />
         </StackLayout>
     </ScrollView>
 </ContentPage>

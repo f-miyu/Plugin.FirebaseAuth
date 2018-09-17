@@ -18,11 +18,11 @@ namespace Plugin.FirebaseAuth
             return new PhoneAuthCredentialWrapper(credential);
         }
 
-        public Task<(IPhoneAuthCredential Credential, string VerificationId)> VerifyPhoneNumberAsync(string phoneNumber)
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(string phoneNumber)
         {
             var activity = FirebaseAuth.CurrentActivity ?? throw new NullReferenceException("current activity is null");
 
-            var tcs = new TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationId)>();
+            var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
             var callbacks = new Callbacks(tcs);
 
             PhoneAuthProvider.Instance.VerifyPhoneNumber(phoneNumber, FirebaseAuth.VerifyingPhoneNumberTimeout, TimeUnit.Seconds, activity, callbacks);
@@ -32,16 +32,16 @@ namespace Plugin.FirebaseAuth
 
         private class Callbacks : PhoneAuthProvider.OnVerificationStateChangedCallbacks
         {
-            private TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationId)> _tcs;
+            private TaskCompletionSource<PhoneNumberVerificationResult> _tcs;
 
-            public Callbacks(TaskCompletionSource<(IPhoneAuthCredential Credential, string VerificationId)> tcs)
+            public Callbacks(TaskCompletionSource<PhoneNumberVerificationResult> tcs)
             {
                 _tcs = tcs;
             }
 
             public override void OnVerificationCompleted(PhoneAuthCredential credential)
             {
-                _tcs.TrySetResult((new PhoneAuthCredentialWrapper(credential), null));
+                _tcs.TrySetResult(new PhoneNumberVerificationResult(new PhoneAuthCredentialWrapper(credential), null));
             }
 
             public override void OnVerificationFailed(FirebaseException exception)
@@ -53,14 +53,14 @@ namespace Plugin.FirebaseAuth
             {
                 base.OnCodeSent(verificationId, forceResendingToken);
 
-                _tcs.TrySetResult((null, verificationId));
+                _tcs.TrySetResult(new PhoneNumberVerificationResult(null, verificationId));
             }
 
             public override void OnCodeAutoRetrievalTimeOut(string verificationId)
             {
                 base.OnCodeAutoRetrievalTimeOut(verificationId);
 
-                _tcs.TrySetResult((null, verificationId));
+                _tcs.TrySetResult(new PhoneNumberVerificationResult(null, verificationId));
             }
         }
     }

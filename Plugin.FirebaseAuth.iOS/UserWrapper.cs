@@ -181,9 +181,9 @@ namespace Plugin.FirebaseAuth
                 {
                     userProfileChangeRequest.DisplayName = request.DisplayName;
                 }
-                if (request.IsPhtoUrlChanged)
+                if (request.IsPhotoUrlChanged)
                 {
-                    userProfileChangeRequest.PhotoUrl = request.PhtoUrl;
+                    userProfileChangeRequest.PhotoUrl = request.PhotoUrl;
                 }
 
                 await userProfileChangeRequest.CommitChangesAsync().ConfigureAwait(false);

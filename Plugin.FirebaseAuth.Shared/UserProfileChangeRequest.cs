@@ -14,18 +14,18 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        private Uri _phtoUrl;
-        public Uri PhtoUrl
+        private Uri _photoUrl;
+        public Uri PhotoUrl
         {
-            get => _phtoUrl;
+            get => _photoUrl;
             set
             {
-                _phtoUrl = value;
-                IsPhtoUrlChanged = true;
+                _photoUrl = value;
+                IsPhotoUrlChanged = true;
             }
         }
 
         internal bool IsDisplayNameChanged { get; private set; }
-        internal bool IsPhtoUrlChanged { get; private set; }
+        internal bool IsPhotoUrlChanged { get; private set; }
     }
 }

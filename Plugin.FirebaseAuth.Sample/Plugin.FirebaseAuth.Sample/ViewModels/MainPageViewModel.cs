@@ -163,13 +163,13 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         {
             try
             {
-                var accessToken = await _authService.LoginWithGitHub();
+                var token = await _authService.LoginWithGitHub();
 
-                if (accessToken != null)
+                if (token != null)
                 {
                     var credential = CrossFirebaseAuth.Current
                                                       .GitHubAuthProvider
-                                                      .GetCredential(accessToken);
+                                                      .GetCredential(token);
 
                     var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
 

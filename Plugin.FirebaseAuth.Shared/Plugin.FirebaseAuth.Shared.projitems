@@ -30,5 +30,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ErrorType.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FirebaseAuthException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IOAuthProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PhoneNumberVerificationResult.cs" />
   </ItemGroup>
 </Project>
