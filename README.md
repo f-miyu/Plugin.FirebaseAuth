@@ -7,6 +7,8 @@ and [Xamarin.Firebase.Auth](https://www.nuget.org/packages/Xamarin.Firebase.Auth
 ## Setup
 Install Nuget package to each projects.
 
+[Plugin.FirebaseAuth](https://www.nuget.org/packages/Plugin.FirebaseAuth/) [![NuGet](https://img.shields.io/nuget/v/Plugin.FirebaseAuth.svg?label=NuGet)](https://www.nuget.org/packages/Plugin.FirebaseAuth/)
+
 ### iOS
 * Add GoogleService-Info.plist to iOS project. Select BundleResource as build action.
 * Initialize as follows in AppDelegate. 
