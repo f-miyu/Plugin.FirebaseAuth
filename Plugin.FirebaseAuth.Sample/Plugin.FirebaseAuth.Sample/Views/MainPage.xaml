@@ -12,6 +12,7 @@
             <Button Text="Sign in with Facebook" Command="{Binding SignInWithFacebookCommand}" />
             <Button Text="Sign in with GitHub" Command="{Binding SignInWithGitHubCommand}" />
             <Button Text="Sign in with Phone Number" Command="{Binding SignInWithPhoneNumberCommand}" />
+            <Button Text="Sign in Anonymously" Command="{Binding SignInAnonymouslyCommand}" />
             <Button Text="User" Command="{Binding ShowUserCommand}" />
         </StackLayout>
     </ScrollView>

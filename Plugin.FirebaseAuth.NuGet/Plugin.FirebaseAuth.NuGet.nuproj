@@ -5,10 +5,10 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{52E38BFA-D096-4F6A-A249-9E4BCFFADC55}</ProjectGuid>
-    <Description>Plugin.FirebaseAuth</Description>
+    <Description>Cross platform plugin for Firebase Authentication</Description>
     <PackageId>Plugin.FirebaseAuth</PackageId>
     <PackageVersion>1.0.0</PackageVersion>
-    <Authors>f-matsushima</Authors>
+    <Authors>f-miyu</Authors>
     <DevelopmentDependency>false</DevelopmentDependency>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <OutputType>Exe</OutputType>
@@ -16,6 +16,11 @@
     <UsePartialTypes>false</UsePartialTypes>
     <AssemblyName>Plugin.FirebaseAuth.NuGet</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <Owners>f-miyu</Owners>
+    <PackageTags>xamarin, ios, android, xamarin.forms, plugin, firebase, auth, authentication</PackageTags>
+    <Title>Firebase Authentication Plugin for Xamarin</Title>
+    <PackageProjectUrl>https://github.com/f-miyu/Plugin.FirebaseAuth</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/f-miyu/Plugin.FirebaseAuth/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

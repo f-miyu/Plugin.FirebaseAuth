@@ -25,6 +25,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         public AsyncReactiveCommand SignInWithFacebookCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand SignInWithGitHubCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand SignInWithPhoneNumberCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand SignInAnonymouslyCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand ShowUserCommand { get; }
 
         private readonly IPageDialogService _pageDialogService;
@@ -54,6 +55,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
             SignInWithFacebookCommand.Subscribe(SignInWithFacebook);
             SignInWithGitHubCommand.Subscribe(SignInWithGitHub);
             SignInWithPhoneNumberCommand.Subscribe(SignInWithPhoneNumber);
+            SignInAnonymouslyCommand.Subscribe(SignInSignInAnonymously);
             ShowUserCommand.Subscribe(async () => await NavigationService.NavigateAsync<UserPageViewModel>());
         }
 
@@ -191,6 +193,22 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
             if (result != null)
             {
                 await _pageDialogService.DisplayAlertAsync("Success", result.User.PhoneNumber, "OK");
+            }
+        }
+
+        private async Task SignInSignInAnonymously()
+        {
+            try
+            {
+                var result = await CrossFirebaseAuth.Current.SignInAnonymouslyAsync();
+
+                await _pageDialogService.DisplayAlertAsync("Success", null, "OK");
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+
+                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
             }
         }
     }
