@@ -185,7 +185,8 @@ namespace Plugin.FirebaseAuth
                 }
                 if (request.IsPhotoUrlChanged)
                 {
-                    builder.SetPhotoUri(Android.Net.Uri.Parse(request.PhotoUrl.ToString()));
+                    var uri = request.PhotoUrl != null ? Android.Net.Uri.Parse(request.PhotoUrl.ToString()) : null;
+                    builder.SetPhotoUri(uri);
                 }
 
                 await User.UpdateProfileAsync(builder.Build()).ConfigureAwait(false);

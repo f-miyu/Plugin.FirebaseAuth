@@ -183,7 +183,7 @@ namespace Plugin.FirebaseAuth
                 }
                 if (request.IsPhotoUrlChanged)
                 {
-                    userProfileChangeRequest.PhotoUrl = request.PhotoUrl;
+                    userProfileChangeRequest.PhotoUrl = request.PhotoUrl != null ? new NSUrl(request.PhotoUrl.ToString()) : null;
                 }
 
                 await userProfileChangeRequest.CommitChangesAsync().ConfigureAwait(false);

@@ -13,7 +13,7 @@ namespace Plugin.FirebaseAuth
 
             if (self.IsUrlChanged)
             {
-                actionCodeSettings.Url = self.Url == null ? null : new NSUrl(self.Url);
+                actionCodeSettings.Url = self.Url != null ? new NSUrl(self.Url) : null;
             }
             if (self.IsIosBundleIdChanged)
             {
