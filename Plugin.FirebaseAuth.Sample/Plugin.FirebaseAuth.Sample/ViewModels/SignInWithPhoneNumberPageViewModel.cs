@@ -5,25 +5,26 @@ using Prism.Navigation;
 using Plugin.FirebaseAuth.Sample.Extensins;
 using Prism.Services;
 using Xamarin.Forms;
+using System.Threading.Tasks;
 
 namespace Plugin.FirebaseAuth.Sample.ViewModels
 {
-    public class LoginWithPhoneNumberPageViewModel : ViewModelBaseResult<(IAuthResult Result, Exception Exception)>
+    public class SignInWithPhoneNumberPageViewModel : ViewModelBaseResult<IAuthResult>
     {
         public ReactivePropertySlim<string> PhoneNumber { get; } = new ReactivePropertySlim<string>();
-        public AsyncReactiveCommand LoginCommand { get; }
+        public AsyncReactiveCommand SignInCommand { get; }
 
         private readonly IPageDialogService _pageDialogService;
 
-        public LoginWithPhoneNumberPageViewModel(INavigationService navigationService, IPageDialogService pageDialogService) : base(navigationService)
+        public SignInWithPhoneNumberPageViewModel(INavigationService navigationService, IPageDialogService pageDialogService) : base(navigationService)
         {
             Title = "Phone Numbe";
 
             _pageDialogService = pageDialogService;
 
-            LoginCommand = PhoneNumber.Select(s => !string.IsNullOrEmpty(s)).ToAsyncReactiveCommand();
+            SignInCommand = PhoneNumber.Select(s => !string.IsNullOrEmpty(s)).ToAsyncReactiveCommand();
 
-            LoginCommand.Subscribe(async () =>
+            SignInCommand.Subscribe(async () =>
             {
                 try
                 {
@@ -35,7 +36,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                     {
                         var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
 
-                        await NavigationService.GoBackAsync<(IAuthResult Result, Exception Exception)>((result, null));
+                        await NavigationService.GoBackAsync(result);
                     }
                     else
                     {
@@ -47,7 +48,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
                             var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
 
-                            await NavigationService.GoBackAsync<(IAuthResult Result, Exception Exception)>((result, null));
+                            await NavigationService.GoBackAsync(result);
                         }
                     }
                 }
@@ -55,7 +56,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 {
                     System.Diagnostics.Debug.WriteLine(e);
 
-                    await NavigationService.GoBackAsync<(IAuthResult Result, Exception Exception)>((null, e));
+                    await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
                 }
             });
         }

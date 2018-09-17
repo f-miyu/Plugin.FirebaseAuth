@@ -15,7 +15,7 @@ namespace Plugin.FirebaseAuth
         {
             get
             {
-                if (_profile == null)
+                if (AdditionalUserInfo.Profile != null && _profile == null)
                 {
                     _profile = new Dictionary<string, Object>();
                     foreach (var (key, value) in AdditionalUserInfo.Profile)

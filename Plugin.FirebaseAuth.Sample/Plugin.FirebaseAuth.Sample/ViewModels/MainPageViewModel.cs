@@ -18,319 +18,179 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 {
     public class MainPageViewModel : ViewModelBase
     {
-        public AsyncReactiveCommand GoogleLoginCommand { get; } = new AsyncReactiveCommand();
-        public AsyncReactiveCommand TwitterLoginCommand { get; } = new AsyncReactiveCommand();
-        public AsyncReactiveCommand FacebookLoginCommand { get; } = new AsyncReactiveCommand();
-        public AsyncReactiveCommand GitHubLoginCommand { get; } = new AsyncReactiveCommand();
-        public AsyncReactiveCommand PhoneNumberLoginCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand SignUpCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand SignInWithEmailAndPasswordCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand SignInWithGoogleCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand SignInWithTwitterCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand SignInWithFacebookCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand SignInWithGitHubCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand SignInWithPhoneNumberCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand ShowUserCommand { get; }
 
         private readonly IPageDialogService _pageDialogService;
+        private ReactivePropertySlim<bool> _isSignedIn = new ReactivePropertySlim<bool>();
+        private IListenerRegistration _registration;
+        private IAuthService _authService;
 
-        public MainPageViewModel(INavigationService navigationService, IPageDialogService pageDialogService)
+        public MainPageViewModel(INavigationService navigationService, IPageDialogService pageDialogService, IAuthService authService)
             : base(navigationService)
         {
             _pageDialogService = pageDialogService;
+            _authService = authService;
 
             Title = "Main Page";
 
-            GoogleLoginCommand.Subscribe(LoginWithGoogle);
-            TwitterLoginCommand.Subscribe(LoginWithTwitter);
-            FacebookLoginCommand.Subscribe(LoginWithFacebook);
-            GitHubLoginCommand.Subscribe(LoginWithGitHub);
-            PhoneNumberLoginCommand.Subscribe(LoginWithPhoneNumber);
+            _registration = CrossFirebaseAuth.Current.AddAuthStateChangedListener((user) =>
+            {
+                _isSignedIn.Value = user != null;
+            });
+
+            ShowUserCommand = _isSignedIn.ToAsyncReactiveCommand();
+
+            SignUpCommand.Subscribe(SignUp);
+            SignInWithEmailAndPasswordCommand.Subscribe(SignInWithEmailAndPassword);
+            SignInWithGoogleCommand.Subscribe(SignInWithGoogle);
+            SignInWithTwitterCommand.Subscribe(SignInWithTwitter);
+            SignInWithFacebookCommand.Subscribe(SignInWithFacebook);
+            SignInWithGitHubCommand.Subscribe(SignInWithGitHub);
+            SignInWithPhoneNumberCommand.Subscribe(SignInWithPhoneNumber);
+            ShowUserCommand.Subscribe(async () => await NavigationService.NavigateAsync<UserPageViewModel>());
         }
 
-        private async Task LoginWithGoogle()
+        public override void Destroy()
+        {
+            base.Destroy();
+
+            _registration.Remove();
+        }
+
+        private async Task SignUp()
+        {
+            var user = await NavigationService.NavigateAsync<SignUpPageViewModel, IUser>();
+
+            if (user != null)
+            {
+                await _pageDialogService.DisplayAlertAsync("Success", user.DisplayName, "OK");
+            }
+        }
+
+        private async Task SignInWithEmailAndPassword()
+        {
+            var user = await NavigationService.NavigateAsync<SignInWithEmailAndPasswordPageViewModel, IUser>();
+
+            if (user != null)
+            {
+                await _pageDialogService.DisplayAlertAsync("Success", user.DisplayName, "OK");
+            }
+        }
+
+        private async Task SignInWithGoogle()
         {
             try
             {
-                var tcs = new TaskCompletionSource<(string idToken, string accessToken)>();
+                var (idToken, accessToken) = await _authService.LoginWithGoogle();
 
-                string clientId = null;
-                string redirectUri = null;
-
-                switch (Device.RuntimePlatform)
+                if (idToken != null)
                 {
-                    case Device.iOS:
-                        clientId = Constants.GoogleIosClientId;
-                        redirectUri = Constants.GoogleIosRedirectUrl;
-                        break;
-                    case Device.Android:
-                        clientId = Constants.GoogleAndroidClientId;
-                        redirectUri = Constants.GoogleAndroidRedirectUrl;
-                        break;
+                    var credential = CrossFirebaseAuth.Current
+                                                      .GoogleAuthProvider
+                                                      .GetCredential(idToken, accessToken);
+
+                    var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
+
+                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
                 }
-
-                var authenticator = new CustomOAuth2Authenticator(clientId,
-                                                                  null,
-                                                                  "https://www.googleapis.com/auth/userinfo.email",
-                                                                  new Uri("https://accounts.google.com/o/oauth2/auth"),
-                                                                  new Uri(redirectUri),
-                                                                  new Uri("https://www.googleapis.com/oauth2/v4/token"),
-                                                                  null,
-                                                                  true);
-
-                authenticator.Completed += (sender, e) =>
-                {
-                    if (e.IsAuthenticated && e.Account != null && e.Account.Properties != null)
-                    {
-                        var properties = e.Account.Properties;
-
-                        tcs.TrySetResult((properties["id_token"], properties["access_token"]));
-                    }
-                    else
-                    {
-                        tcs.TrySetCanceled();
-                    }
-                };
-
-                authenticator.Error += (sender, e) =>
-                {
-                    tcs.TrySetException(e.Exception ?? new Exception(e.Message));
-                };
-
-                AuthenticationState.Authenticator = authenticator;
-
-                var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-                presenter.Login(authenticator);
-
-                var (idToken, accessToken) = await tcs.Task.ConfigureAwait(false);
-
-                var credential = CrossFirebaseAuth.Current
-                                                  .GoogleAuthProvider
-                                                  .GetCredential(idToken, accessToken);
-
-                var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential).ConfigureAwait(false);
-
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
-                });
             }
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e);
 
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
-                });
+                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
             }
         }
 
-        private async Task LoginWithTwitter()
+        private async Task SignInWithTwitter()
         {
             try
             {
-                var tcs = new TaskCompletionSource<(string Token, string Secret)>();
+                var (token, secret) = await _authService.LoginWithTwitter();
 
-                var authenticator = new CustomOAuth1Authenticator(Constants.TwitterConsumerKey,
-                                                                  Constants.TwitterConsumerSecret,
-                                                                  new Uri("https://api.twitter.com/oauth/request_token"),
-                                                                  new Uri("https://api.twitter.com/oauth/authorize"),
-                                                                  new Uri("https://api.twitter.com/oauth/access_token"),
-                                                                  new Uri(Constants.TwitterRedirectUrl),
-                                                                  null,
-                                                                  true);
-
-                authenticator.Completed += (sender, e) =>
+                if (token != null && secret != null)
                 {
-                    if (e.IsAuthenticated && e.Account != null && e.Account.Properties != null)
-                    {
-                        var properties = e.Account.Properties;
+                    var credential = CrossFirebaseAuth.Current
+                                                      .TwitterAuthProvider
+                                                      .GetCredential(token, secret);
 
-                        tcs.TrySetResult((properties["oauth_token"], properties["oauth_token_secret"]));
-                    }
-                    else
-                    {
-                        tcs.TrySetCanceled();
-                    }
-                };
+                    var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
 
-                authenticator.Error += (sender, e) =>
-                {
-                    tcs.TrySetException(e.Exception ?? new Exception(e.Message));
-                };
-
-                AuthenticationState.Authenticator = authenticator;
-
-                var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-                presenter.Login(authenticator);
-
-                var (token, secret) = await tcs.Task.ConfigureAwait(false);
-
-                var credential = CrossFirebaseAuth.Current
-                                                  .TwitterAuthProvider
-                                                  .GetCredential(token, secret);
-
-                var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential).ConfigureAwait(false);
-
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
-                });
+                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+                }
             }
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e);
 
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
-                });
+                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
             }
         }
 
-        private async Task LoginWithFacebook()
+        private async Task SignInWithFacebook()
         {
             try
             {
-                var tcs = new TaskCompletionSource<string>();
+                var accessToken = await _authService.LoginWithFacebook();
 
-                var authenticator = new CustomOAuth2Authenticator(Constants.FacebookClientId,
-                                                                  null,
-                                                                  new Uri("https://m.facebook.com/dialog/oauth"),
-                                                                  new Uri(Constants.FacebookRedirectUrl),
-                                                                  null,
-                                                                  true);
-
-                authenticator.Completed += (sender, e) =>
+                if (accessToken != null)
                 {
-                    if (e.IsAuthenticated && e.Account != null && e.Account.Properties != null)
-                    {
-                        var properties = e.Account.Properties;
+                    var credential = CrossFirebaseAuth.Current
+                                                      .FacebookAuthProvider
+                                                      .GetCredential(accessToken);
 
-                        tcs.TrySetResult((properties["access_token"]));
-                    }
-                    else
-                    {
-                        tcs.TrySetCanceled();
-                    }
-                };
+                    var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
 
-                authenticator.Error += (sender, e) =>
-                {
-                    tcs.TrySetException(e.Exception ?? new Exception(e.Message));
-                };
-
-                AuthenticationState.Authenticator = authenticator;
-
-                var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-                presenter.Login(authenticator);
-
-                var accessToken = await tcs.Task.ConfigureAwait(false);
-
-                var credential = CrossFirebaseAuth.Current
-                                                  .FacebookAuthProvider
-                                                  .GetCredential(accessToken);
-
-                var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential).ConfigureAwait(false);
-
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
-                });
+                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+                }
             }
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e);
 
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
-                });
+                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
             }
         }
 
-        private async Task LoginWithGitHub()
+        private async Task SignInWithGitHub()
         {
             try
             {
-                var tcs = new TaskCompletionSource<string>();
+                var accessToken = await _authService.LoginWithGitHub();
 
-                var authenticator = new CustomOAuth2Authenticator(Constants.GitHubClientId,
-                                                                  Constants.GitHubClientSecret,
-                                                                  "user",
-                                                                  new Uri("https://github.com/login/oauth/authorize"),
-                                                                  new Uri(Constants.GitHubRedirectUrl),
-                                                                  new Uri("https://github.com/login/oauth/access_token"),
-                                                                  null,
-                                                                  true);
-
-                authenticator.Completed += (sender, e) =>
+                if (accessToken != null)
                 {
-                    if (e.IsAuthenticated && e.Account != null && e.Account.Properties != null)
-                    {
-                        var properties = e.Account.Properties;
+                    var credential = CrossFirebaseAuth.Current
+                                                      .GitHubAuthProvider
+                                                      .GetCredential(accessToken);
 
-                        tcs.TrySetResult((properties["access_token"]));
-                    }
-                    else
-                    {
-                        tcs.TrySetCanceled();
-                    }
-                };
+                    var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
 
-                authenticator.Error += (sender, e) =>
-                {
-                    tcs.TrySetException(e.Exception ?? new Exception(e.Message));
-                };
-
-                AuthenticationState.Authenticator = authenticator;
-
-                var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-                presenter.Login(authenticator);
-
-                var token = await tcs.Task.ConfigureAwait(false);
-
-                var credential = CrossFirebaseAuth.Current
-                                                  .GitHubAuthProvider
-                                                  .GetCredential(token);
-
-                var user = CrossFirebaseAuth.Current.CurrentUser;
-
-                var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential).ConfigureAwait(false);
-
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
-                });
+                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+                }
             }
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(e);
 
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
-                });
+                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
             }
         }
 
-        private async Task LoginWithPhoneNumber()
+        private async Task SignInWithPhoneNumber()
         {
-            var (result, exception) = await NavigationService.NavigateAsync<LoginWithPhoneNumberPageViewModel, (IAuthResult Result, Exception Exception)>();
+            var result = await NavigationService.NavigateAsync<SignInWithPhoneNumberPageViewModel, IAuthResult>();
 
-            if (exception != null)
+            if (result != null)
             {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    _pageDialogService.DisplayAlertAsync("Failure", exception.Message, "OK");
-                });
-            }
-            else if (result != null)
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
-                });
-            }
-            else
-            {
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    _pageDialogService.DisplayAlertAsync("Failure", "Canceled", "OK");
-                });
+                await _pageDialogService.DisplayAlertAsync("Success", result.User.PhoneNumber, "OK");
             }
         }
     }

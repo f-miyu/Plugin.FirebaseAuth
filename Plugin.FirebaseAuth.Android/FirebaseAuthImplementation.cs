@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Firebase;
+using System.Linq;
+using Android.Runtime;
 
 namespace Plugin.FirebaseAuth
 {
@@ -18,17 +20,9 @@ namespace Plugin.FirebaseAuth
 
         public IPhoneAuthProvider PhoneAuthProvider { get; } = new PhoneAuthProviderWrapper();
 
-        public IUser CurrentUser
-        {
-            get
-            {
-                if (_instance.CurrentUser != null)
-                {
-                    return new UserWrapper(_instance.CurrentUser);
-                }
-                return null;
-            }
-        }
+        public IOAuthProvider OAuthProvider { get; } = new OAuthProviderWrapper();
+
+        public IUser CurrentUser => _instance.CurrentUser != null ? new UserWrapper(_instance.CurrentUser) : null;
 
         public string LanguageCode
         {
@@ -104,11 +98,12 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task FetchProvidersForEmailAsync(string email)
+        public async Task<string[]> FetchProvidersForEmailAsync(string email)
         {
             try
             {
-                await _instance.FetchProvidersForEmailAsync(email).ConfigureAwait(false);
+                var result = await _instance.FetchProvidersForEmailAsync(email).ConfigureAwait(false);
+                return result.Providers.ToArray();
             }
             catch (FirebaseException e)
             {
@@ -128,32 +123,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task SendPasswordResetEmailAsync(string email, ActionCodeSettings settings)
+        public async Task SendPasswordResetEmailAsync(string email, ActionCodeSettings actionCodeSettings)
         {
             try
             {
-                var builder = Firebase.Auth.ActionCodeSettings.NewBuilder();
-
-                if (settings.IsUrlChanged)
-                {
-                    builder.SetUrl(settings.Url);
-                }
-                if (settings.IsIosBundleIdChanged)
-                {
-                    builder.SetIOSBundleId(settings.IosBundleId);
-                }
-                if (settings.IsAndroidPackageChanged)
-                {
-                    builder.SetAndroidPackageName(settings.AndroidPackageName,
-                                                             settings.AndroidInstallIfNotAvailable,
-                                                             settings.AndroidMinimumVersion);
-                }
-                if (settings.IsHandleCodeInAppChanged)
-                {
-                    builder.SetHandleCodeInApp(settings.HandleCodeInApp);
-                }
-
-                await _instance.SendPasswordResetEmailAsync(email, builder.Build()).ConfigureAwait(false);
+                await _instance.SendPasswordResetEmailAsync(email, actionCodeSettings.ToNative()).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -185,11 +159,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task ConfirmPasswordResetAsync(string email, string newPassword)
+        public async Task ConfirmPasswordResetAsync(string code, string newPassword)
         {
             try
             {
-                await _instance.ConfirmPasswordResetAsync(email, newPassword).ConfigureAwait(false);
+                await _instance.ConfirmPasswordResetAsync(code, newPassword).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -197,16 +171,29 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task VerifyPasswordResetCodeAsync(string code)
+        public Task<string> VerifyPasswordResetCodeAsync(string code)
         {
-            try
+            var tcs = new TaskCompletionSource<string>();
+
+            _instance.VerifyPasswordResetCode(code).AddOnCompleteListener(new OnCompleteHandlerListener(task =>
             {
-                await _instance.VerifyPasswordResetCodeAsync(code).ConfigureAwait(false);
-            }
-            catch (FirebaseException e)
-            {
-                throw ExceptionMapper.Map(e);
-            }
+                if (task.IsSuccessful)
+                {
+                    var result = task.Result.ToString();
+                    tcs.SetResult(result);
+                }
+                else
+                {
+                    Exception exception = task.Exception;
+                    if (exception is FirebaseException firebaseException)
+                    {
+                        exception = ExceptionMapper.Map(firebaseException);
+                    }
+                    tcs.SetException(exception);
+                }
+            }));
+
+            return tcs.Task;
         }
 
         public void SignOut()

@@ -19,17 +19,9 @@ namespace Plugin.FirebaseAuth
 
         public IPhoneAuthProvider PhoneAuthProvider { get; } = new PhoneAuthProviderWrapper();
 
-        public IUser CurrentUser
-        {
-            get
-            {
-                if (_instance.CurrentUser != null)
-                {
-                    return new UserWrapper(_instance.CurrentUser);
-                }
-                return null;
-            }
-        }
+        public IOAuthProvider OAuthProvider { get; } = new OAuthProviderWrapper();
+
+        public IUser CurrentUser => _instance.CurrentUser != null ? new UserWrapper(_instance.CurrentUser) : null;
 
         public string LanguageCode
         {
@@ -106,11 +98,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task FetchProvidersForEmailAsync(string email)
+        public async Task<string[]> FetchProvidersForEmailAsync(string email)
         {
             try
             {
-                await _instance.FetchProvidersAsync(email).ConfigureAwait(false);
+                return await _instance.FetchProvidersAsync(email).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -130,32 +122,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task SendPasswordResetEmailAsync(string email, ActionCodeSettings settings)
+        public async Task SendPasswordResetEmailAsync(string email, ActionCodeSettings actionCodeSettings)
         {
             try
             {
-                var actionCodeSettings = new Firebase.Auth.ActionCodeSettings();
-
-                if (settings.IsUrlChanged)
-                {
-                    actionCodeSettings.Url = settings.Url == null ? null : new NSUrl(settings.Url);
-                }
-                if (settings.IsIosBundleIdChanged)
-                {
-                    actionCodeSettings.IOSBundleId = settings.IosBundleId;
-                }
-                if (settings.IsAndroidPackageChanged)
-                {
-                    actionCodeSettings.SetAndroidPackageName(settings.AndroidPackageName,
-                                                             settings.AndroidInstallIfNotAvailable,
-                                                             settings.AndroidMinimumVersion);
-                }
-                if (settings.IsHandleCodeInAppChanged)
-                {
-                    actionCodeSettings.HandleCodeInApp = settings.HandleCodeInApp;
-                }
-
-                await _instance.SendPasswordResetAsync(email, actionCodeSettings).ConfigureAwait(false);
+                await _instance.SendPasswordResetAsync(email, actionCodeSettings.ToNative()).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -187,11 +158,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task ConfirmPasswordResetAsync(string email, string newPassword)
+        public async Task ConfirmPasswordResetAsync(string code, string newPassword)
         {
             try
             {
-                await _instance.ConfirmPasswordResetAsync(email, newPassword).ConfigureAwait(false);
+                await _instance.ConfirmPasswordResetAsync(code, newPassword).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -199,11 +170,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task VerifyPasswordResetCodeAsync(string code)
+        public async Task<string> VerifyPasswordResetCodeAsync(string code)
         {
             try
             {
-                await _instance.VerifyPasswordResetCodeAsync(code).ConfigureAwait(false);
+                return await _instance.VerifyPasswordResetCodeAsync(code).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {

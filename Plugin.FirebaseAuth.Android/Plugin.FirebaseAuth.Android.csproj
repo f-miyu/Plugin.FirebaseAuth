@@ -76,8 +76,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FirebaseAuthImplementation.cs" />
     <Compile Include="FirebaseAuth.cs" />
+    <Compile Include="FirebaseAuthImplementation.cs" />
     <Compile Include="AuthCredentialWrapper.cs" />
     <Compile Include="PhoneAuthProviderWrapper.cs" />
     <Compile Include="PhoneAuthCredentialWrapper.cs" />
@@ -91,6 +91,9 @@
     <Compile Include="UserInfoWrapper.cs" />
     <Compile Include="AuthResultWrapper.cs" />
     <Compile Include="AdditionalUserInfoWrapper.cs" />
+    <Compile Include="OAuthProviderWrapper.cs" />
+    <Compile Include="ActionCodeSettingsExtensions.cs" />
+    <Compile Include="OnCompleteHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

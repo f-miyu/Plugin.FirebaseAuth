@@ -15,7 +15,7 @@ namespace Plugin.FirebaseAuth
         {
             get
             {
-                if (_profile == null)
+                if (AdditionalUserInfo.Profile != null && _profile == null)
                 {
                     _profile = AdditionalUserInfo.Profile.ToDictionary(pair => pair.Key, pair => ConvertProfileValue(pair.Value));
                 }

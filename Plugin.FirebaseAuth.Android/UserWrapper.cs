@@ -24,31 +24,9 @@ namespace Plugin.FirebaseAuth
 
         public string PhoneNumber => User.PhoneNumber;
 
-        private Uri _photoUrl;
-        public Uri PhotoUrl
-        {
-            get
-            {
-                if (_photoUrl == null && User.PhotoUrl != null)
-                {
-                    _photoUrl = new Uri(User.PhotoUrl.ToString());
-                }
-                return _photoUrl;
-            }
-        }
+        public Uri PhotoUrl => User.PhotoUrl != null ? new Uri(User.PhotoUrl.ToString()) : null;
 
-        private IEnumerable<IUserInfo> _providerData;
-        public IEnumerable<IUserInfo> ProviderData
-        {
-            get
-            {
-                if (_providerData == null)
-                {
-                    _providerData = User.ProviderData.Select(userInfo => new UserInfoWrapper(userInfo));
-                }
-                return _providerData;
-            }
-        }
+        public IEnumerable<IUserInfo> ProviderData => User.ProviderData.Select(userInfo => new UserInfoWrapper(userInfo));
 
         public string ProviderId => User.ProviderId;
 
@@ -114,6 +92,30 @@ namespace Plugin.FirebaseAuth
             try
             {
                 await User.ReloadAsync().ConfigureAwait(false);
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public async Task SendEmailVerificationAsync()
+        {
+            try
+            {
+                await User.SendEmailVerificationAsync(null).ConfigureAwait(false);
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public async Task SendEmailVerificationAsync(ActionCodeSettings actionCodeSettings)
+        {
+            try
+            {
+                await User.SendEmailVerificationAsync(actionCodeSettings.ToNative()).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {

@@ -35,8 +35,6 @@ namespace Plugin.FirebaseAuth.Sample.iOS
 
         public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
         {
-            //return SignIn.SharedInstance.HandleUrl(url, options["UIApplicationOpenURLOptionsSourceApplicationKey"].ToString(),
-            //options["UIApplicationOpenURLOptionsAnnotationKey"]);
             var uri = new Uri(url.AbsoluteString);
 
             AuthenticationState.Authenticator.OnPageLoaded(uri);

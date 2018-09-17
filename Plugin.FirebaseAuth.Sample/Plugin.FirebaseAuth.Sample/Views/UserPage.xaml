@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:Plugin.FirebaseAuth.Sample.Converters"
+             x:Class="Plugin.FirebaseAuth.Sample.Views.UserPage"
+             Title="{Binding Title}">
+    <ScrollView>
+        <StackLayout HorizontalOptions="FillAndExpand" Padding="8,0">
+            <Label Text="Name:" />
+            <Entry Text="{Binding Name.Value}" />
+            <Label Text="Email:" />
+            <Entry Text="{Binding Email.Value}"  Keyboard="Email"/>
+            <Label Text="Phone Number:" />
+            <Entry Text="{Binding PhoneNumber.Value}" Keyboard="Telephone"/>
+            <Button Text="Update Name" Command="{Binding UpdateNameCommand}"  HorizontalOptions="Center" />
+            <Button Text="Update Email" Command="{Binding UpdateEmailCommand}"  HorizontalOptions="Center" />
+            <Button Text="Update Phone Numbe" Command="{Binding UpdatePhoneNumberCommand}"  HorizontalOptions="Center" />
+            <Button Command="{Binding LinkOrUnlinkWithGoogleCommand}"  HorizontalOptions="Center" >
+                <Button.Text>
+                    <Binding Path="IsLinkedWithGoogle.Value">
+                        <Binding.Converter>
+                            <converters:BoolToObjectConverter x:TypeArguments="x:String"
+                                                              TrueObject="Unlink with Google"
+                                                              FalseObject="Link with Google" />
+                        </Binding.Converter>
+                    </Binding>
+                </Button.Text>
+            </Button>
+            <Button Command="{Binding LinkOrUnlinkWithTwitterCommand}"  HorizontalOptions="Center" >
+                <Button.Text>
+                    <Binding Path="IsLinkedWithTwitter.Value">
+                        <Binding.Converter>
+                            <converters:BoolToObjectConverter x:TypeArguments="x:String"
+                                                              TrueObject="Unlink with Twitter"
+                                                              FalseObject="Link with Twitter" />
+                        </Binding.Converter>
+                    </Binding>
+                </Button.Text>
+            </Button>
+            <Button Command="{Binding LinkOrUnlinkWithFacebookCommand}"  HorizontalOptions="Center">
+                <Button.Text>
+                    <Binding Path="IsLinkedWithFacebook.Value">
+                        <Binding.Converter>
+                            <converters:BoolToObjectConverter x:TypeArguments="x:String"
+                                                              TrueObject="Unlink with Facebook"
+                                                              FalseObject="Link with Facebook" />
+                        </Binding.Converter>
+                    </Binding>
+                </Button.Text>
+            </Button>
+            <Button Command="{Binding LinkOrUnlinkWithGitHubCommand}"  HorizontalOptions="Center" >
+                <Button.Text>
+                    <Binding Path="IsLinkedWithGitHub.Value">
+                        <Binding.Converter>
+                            <converters:BoolToObjectConverter x:TypeArguments="x:String"
+                                                              TrueObject="Unlink with GitHub"
+                                                              FalseObject="Link with GitHub" />
+                        </Binding.Converter>
+                    </Binding>
+                </Button.Text>
+            </Button>
+            <Button Text="Sign out" Command="{Binding SignOutCommand}"  HorizontalOptions="Center" />
+        </StackLayout>
+    </ScrollView>
+</ContentPage>

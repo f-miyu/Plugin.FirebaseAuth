@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
-             x:Class="Plugin.FirebaseAuth.Sample.Views.LoginWithPhoneNumberPage"
+             x:Class="Plugin.FirebaseAuth.Sample.Views.SignInWithPhoneNumberPage"
              Title="{Binding Title}">
     <StackLayout HorizontalOptions="FillAndExpand" Padding="8,0">
         <Label Text="Phone Number:" />
         <Entry Text="{Binding PhoneNumber.Value}"  Keyboard="Telephone" />
-        <Button Text="Login" Command="{Binding LoginCommand}" />
+        <Button Text="Sign in" Command="{Binding SignInCommand}"  HorizontalOptions="Center" />
     </StackLayout>
 </ContentPage>
+
+

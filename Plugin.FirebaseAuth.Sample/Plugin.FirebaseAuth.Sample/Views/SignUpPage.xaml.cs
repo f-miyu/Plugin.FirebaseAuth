@@ -5,9 +5,9 @@ using Xamarin.Forms;
 
 namespace Plugin.FirebaseAuth.Sample.Views
 {
-    public partial class LoginWithPhoneNumberPage : ContentPage
+    public partial class SignUpPage : ContentPage
     {
-        public LoginWithPhoneNumberPage()
+        public SignUpPage()
         {
             InitializeComponent();
         }

@@ -3,6 +3,7 @@ using Prism.Navigation;
 using Reactive.Bindings;
 using System.Reactive.Linq;
 using Plugin.FirebaseAuth.Sample.Extensins;
+using System.Threading.Tasks;
 
 namespace Plugin.FirebaseAuth.Sample.ViewModels
 {

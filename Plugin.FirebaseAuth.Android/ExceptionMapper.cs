@@ -8,6 +8,7 @@ namespace Plugin.FirebaseAuth
         public static Exception Map(FirebaseException exception)
         {
             var errorType = ErrorType.Other;
+            string reason = null;
             switch (exception)
             {
                 case FirebaseNetworkException firebaseNetworkException:
@@ -27,6 +28,7 @@ namespace Plugin.FirebaseAuth
                     break;
                 case FirebaseAuthWeakPasswordException firebaseAuthWeakPasswordException:
                     errorType = ErrorType.WeakPassword;
+                    reason = firebaseAuthWeakPasswordException.Reason;
                     break;
                 case FirebaseAuthUserCollisionException firebaseAuthUserCollisionException:
                     errorType = ErrorType.UserCollision;
@@ -39,7 +41,7 @@ namespace Plugin.FirebaseAuth
                     break;
             }
 
-            return new FirebaseAuthException(exception.Message, exception, errorType);
+            return new FirebaseAuthException(exception.Message, exception, errorType, reason);
         }
     }
 }

@@ -14,6 +14,7 @@ namespace Plugin.FirebaseAuth
         ITwitterAuthProvider TwitterAuthProvider { get; }
         IGitHubAuthProvider GitHubAuthProvider { get; }
         IPhoneAuthProvider PhoneAuthProvider { get; }
+        IOAuthProvider OAuthProvider { get; }
         IUser CurrentUser { get; }
         string LanguageCode { get; set; }
         Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password);
@@ -21,13 +22,13 @@ namespace Plugin.FirebaseAuth
         Task<IUser> SignInWithCustomTokenAsync(string token);
         Task<IAuthResult> SignInWithCredentialAsync(IAuthCredential credential);
         Task<IAuthResult> SignInWithEmailAndPasswordAsync(string email, String password);
-        Task FetchProvidersForEmailAsync(string email);
+        Task<string[]> FetchProvidersForEmailAsync(string email);
         Task SendPasswordResetEmailAsync(string email);
-        Task SendPasswordResetEmailAsync(string email, ActionCodeSettings settings);
+        Task SendPasswordResetEmailAsync(string email, ActionCodeSettings actionCodeSettings);
         Task ApplyActionCodeAsync(string code);
         Task CheckActionCodeAsync(string code);
         Task ConfirmPasswordResetAsync(string email, string newPassword);
-        Task VerifyPasswordResetCodeAsync(string code);
+        Task<string> VerifyPasswordResetCodeAsync(string code);
         void SignOut();
         void UseAppLanguage();
         IListenerRegistration AddAuthStateChangedListener(AuthStateChangedHandler listener);

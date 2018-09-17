@@ -15,7 +15,7 @@ namespace Plugin.FirebaseAuth.Sample.Auth
             {
                 base.OnPageLoaded(url);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 OnCancelled();
             }

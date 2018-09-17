@@ -20,6 +20,8 @@ namespace Plugin.FirebaseAuth
         Task<IAuthResult> LinkWithCredentialAsync(IAuthCredential credential);
         Task<IAuthResult> ReauthenticateAndRetrieveDataAsync(IAuthCredential credential);
         Task ReloadAsync();
+        Task SendEmailVerificationAsync();
+        Task SendEmailVerificationAsync(ActionCodeSettings actionCodeSettings);
         Task<IUser> UnlinkAsync(string providerId);
         Task UpdateEmailAsync(string email);
         Task UpdatePasswordAsync(string password);

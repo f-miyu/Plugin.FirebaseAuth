@@ -55,14 +55,6 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.62192275025-h6fgrb0pu1ob7r5qo24h36on0nlo2pjs</string>
-			</array>
-			<key>CFBundleURLName</key>
-			<string>Google OAuth</string>
-		</dict>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
 				<string>firebase-auth-sample</string>
 			</array>
 			<key>CFBundleURLName</key>
@@ -74,7 +66,13 @@
 				<string>fb293961301195586</string>
 			</array>
 			<key>CFBundleURLName</key>
-			<string>Facebook OAuth</string>
+			<string></string>
+		</dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.62192275025-tmj3869rhv7jlj4lt9ogpm4j24sa5pqf</string>
+			</array>
 		</dict>
 	</array>
 </dict>

@@ -8,6 +8,7 @@ namespace Plugin.FirebaseAuth
         public static Exception Map(NSErrorException exception)
         {
             var errorType = ErrorType.Other;
+            string reason = null;
             var errorCode = (AuthErrorCode)(long)exception.Error.Code;
             switch (errorCode)
             {
@@ -34,6 +35,7 @@ namespace Plugin.FirebaseAuth
                     break;
                 case AuthErrorCode.WeakPassword:
                     errorType = ErrorType.WeakPassword;
+                    reason = exception.Error.UserInfo[NSError.LocalizedFailureReasonErrorKey] as NSString;
                     break;
                 case AuthErrorCode.EmailAlreadyInUse:
                 case AuthErrorCode.AccountExistsWithDifferentCredential:
@@ -58,7 +60,7 @@ namespace Plugin.FirebaseAuth
                     break;
             }
 
-            return new FirebaseAuthException(exception.Error.LocalizedDescription, exception, errorType);
+            return new FirebaseAuthException(exception.Error.LocalizedDescription, exception, errorType, reason);
         }
     }
 }

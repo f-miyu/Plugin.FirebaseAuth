@@ -6,7 +6,7 @@
     <StackLayout HorizontalOptions="FillAndExpand" Padding="8,0">
         <Label Text="Verification Code:" />
         <Entry Text="{Binding VerificationCode.Value}" Keyboard="Numeric"/>
-        <Button Text="OK" Command="{Binding OKCommand}" />
-        <Button Text="Cancel" Command="{Binding CancelCommand}" />
+        <Button Text="OK" Command="{Binding OKCommand}" HorizontalOptions="Center"/>
+        <Button Text="Cancel" Command="{Binding CancelCommand}" HorizontalOptions="Center"/>
     </StackLayout>
 </ContentPage>

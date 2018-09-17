@@ -17,10 +17,12 @@
   <ItemGroup>
     <Folder Include="Extensins\" />
     <Folder Include="Auth\" />
+    <Folder Include="Converters\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ViewModels\TwitterAuthPageViewModel.cs" />
     <Compile Remove="Views\TwitterAuthPage.xaml.cs" />
+    <Compile Remove="Views\SignUpPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Remove="Views\TwitterAuthPage.xaml" />

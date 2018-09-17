@@ -67,7 +67,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         {
             base.OnNavigatingTo(parameters);
 
-            if (parameters != null && parameters.ContainsKey(ParameterKey))
+            if (parameters.GetNavigationMode() == NavigationMode.New && parameters.ContainsKey(ParameterKey))
             {
                 var parameter = (TParameer)parameters[ParameterKey];
 
@@ -90,7 +90,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         {
             base.OnNavigatingTo(parameters);
 
-            if (parameters != null && parameters.ContainsKey(TaskCompletionSourceKey))
+            if (parameters.GetNavigationMode() == NavigationMode.New && parameters.ContainsKey(TaskCompletionSourceKey))
             {
                 _tcs = (TaskCompletionSource<TResult>)parameters[TaskCompletionSourceKey];
             }
@@ -103,7 +103,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
             if (_tcs == null || parameters.GetNavigationMode() == NavigationMode.New)
                 return;
 
-            if (parameters != null && parameters.ContainsKey(ParameterKey))
+            if (parameters.ContainsKey(ParameterKey))
             {
                 var parameter = (TResult)parameters[ParameterKey];
 
@@ -133,9 +133,12 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         {
             base.OnNavigatingTo(parameters);
 
-            var parameter = (TParameer)parameters[ParameterKey];
+            if (parameters.GetNavigationMode() == NavigationMode.New && parameters.ContainsKey(ParameterKey))
+            {
+                var parameter = (TParameer)parameters[ParameterKey];
 
-            Prepare(parameter);
+                Prepare(parameter);
+            }
         }
 
         public abstract void Prepare(TParameer parameer);

@@ -68,6 +68,8 @@
     <Compile Include="UserInfoWrapper.cs" />
     <Compile Include="AuthResultWrapper.cs" />
     <Compile Include="AdditionalUserInfoWrapper.cs" />
+    <Compile Include="OAuthProviderWrapper.cs" />
+    <Compile Include="ActionCodeSettingsExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

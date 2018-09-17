@@ -7,6 +7,8 @@ using Xamarin.Forms.Xaml;
 using Prism.DryIoc;
 using System.Reflection;
 using System.Linq;
+using System.Threading.Tasks;
+using Plugin.FirebaseAuth.Sample.Auth;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace Plugin.FirebaseAuth.Sample
@@ -31,10 +33,16 @@ namespace Plugin.FirebaseAuth.Sample
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            var types = GetType().Assembly.GetTypes()
+                                 .Where(t => t.Namespace == "Plugin.FirebaseAuth.Sample.Views");
+
+            foreach (var type in types)
+            {
+                containerRegistry.RegisterForNavigation(type, type.Name);
+            }
+
             containerRegistry.RegisterForNavigation<NavigationPage>();
-            containerRegistry.RegisterForNavigation<MainPage>();
-            containerRegistry.RegisterForNavigation<LoginWithPhoneNumberPage>();
-            containerRegistry.RegisterForNavigation<VerificationCodePage>();
+            containerRegistry.RegisterSingleton<IAuthService, AuthService>();
         }
     }
 }

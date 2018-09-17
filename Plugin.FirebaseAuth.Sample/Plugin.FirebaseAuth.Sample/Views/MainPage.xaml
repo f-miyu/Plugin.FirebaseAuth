@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="Plugin.FirebaseAuth.Sample.Views.MainPage" Title="{Binding Title}">
-    <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
-        <Button Text="Google Login" Command="{Binding GoogleLoginCommand}" />
-        <Button Text="Twitter Login" Command="{Binding TwitterLoginCommand}" />
-        <Button Text="Facebook Login" Command="{Binding FacebookLoginCommand}" />
-        <Button Text="GitHub Login" Command="{Binding GitHubLoginCommand}" />
-        <Button Text="Phone Number Login" Command="{Binding PhoneNumberLoginCommand}" />
-    </StackLayout>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
+             x:Class="Plugin.FirebaseAuth.Sample.Views.MainPage" 
+             Title="{Binding Title}">
+    <ScrollView>
+        <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
+            <Button Text="Sign up" Command="{Binding SignUpCommand}" />
+            <Button Text="Sign in with Email and Password" Command="{Binding SignInWithEmailAndPasswordCommand}" />
+            <Button Text="Sign in with Google" Command="{Binding SignInWithGoogleCommand}" />
+            <Button Text="Sign in with Twitter" Command="{Binding SignInWithTwitterCommand}" />
+            <Button Text="Sign in with Facebook" Command="{Binding SignInWithFacebookCommand}" />
+            <Button Text="Sign in with GitHub" Command="{Binding SignInWithGitHubCommand}" />
+            <Button Text="Sign in with Phone Number" Command="{Binding SignInWithPhoneNumberCommand}" />
+            <Button Text="User" Command="{Binding ShowUserCommand}" />
+        </StackLayout>
+    </ScrollView>
 </ContentPage>
