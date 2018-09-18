@@ -68,12 +68,12 @@ var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credentia
 
 ### Sign in with custom token
 ```C#
-await CrossFirebaseAuth.Current.SignInWithCustomTokenAsync(token);
+var result = await CrossFirebaseAuth.Current.SignInWithCustomTokenAsync(token);
 ```
 
 ### Sign in anonymously
 ```C#
-await CrossFirebaseAuth.Current.SignInAnonymouslyAsync()
+var result = await CrossFirebaseAuth.Current.SignInAnonymouslyAsync()
 ```
 
 ### Get the currently signed-in user
