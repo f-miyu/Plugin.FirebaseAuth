@@ -13,7 +13,7 @@ Install Nuget package to each projects.
 * Add GoogleService-Info.plist to iOS project. Select BundleResource as build action.
 * Initialize as follows in AppDelegate. 
 ```C#
-Plugin.CloudFirestore.CloudFirestore.Init();
+Plugin.FirebaseAuth.FirebaseAuth.Init();
 ```
 
 ### Android
