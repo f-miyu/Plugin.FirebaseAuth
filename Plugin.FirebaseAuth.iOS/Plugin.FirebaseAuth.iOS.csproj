@@ -45,10 +45,10 @@
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
     <Reference Include="Firebase.Core">
-      <HintPath>..\packages\Xamarin.Firebase.iOS.Core.5.0.5\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Firebase.iOS.Core.5.1.3\lib\Xamarin.iOS10\Firebase.Core.dll</HintPath>
     </Reference>
     <Reference Include="Firebase.Auth">
-      <HintPath>..\packages\Xamarin.Firebase.iOS.Auth.5.0.2\lib\Xamarin.iOS10\Firebase.Auth.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Firebase.iOS.Auth.5.0.4\lib\Xamarin.iOS10\Firebase.Auth.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +70,7 @@
     <Compile Include="AdditionalUserInfoWrapper.cs" />
     <Compile Include="OAuthProviderWrapper.cs" />
     <Compile Include="ActionCodeSettingsExtensions.cs" />
+    <Compile Include="InstanceWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

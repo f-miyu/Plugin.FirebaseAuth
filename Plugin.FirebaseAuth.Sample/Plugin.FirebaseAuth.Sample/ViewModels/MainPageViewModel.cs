@@ -41,7 +41,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
             Title = "Main Page";
 
-            _registration = CrossFirebaseAuth.Current.AddAuthStateChangedListener((user) =>
+            _registration = CrossFirebaseAuth.Current.Instance.AddAuthStateChangedListener((user) =>
             {
                 _isSignedIn.Value = user != null;
             });
@@ -95,10 +95,11 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 if (idToken != null)
                 {
                     var credential = CrossFirebaseAuth.Current
+                                                      .Instance
                                                       .GoogleAuthProvider
                                                       .GetCredential(idToken, accessToken);
 
-                    var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
+                    var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
 
                     await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
                 }
@@ -120,10 +121,11 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 if (token != null && secret != null)
                 {
                     var credential = CrossFirebaseAuth.Current
+                                                      .Instance
                                                       .TwitterAuthProvider
                                                       .GetCredential(token, secret);
 
-                    var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
+                    var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
 
                     await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
                 }
@@ -145,10 +147,11 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 if (accessToken != null)
                 {
                     var credential = CrossFirebaseAuth.Current
+                                                      .Instance
                                                       .FacebookAuthProvider
                                                       .GetCredential(accessToken);
 
-                    var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
+                    var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
 
                     await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
                 }
@@ -170,10 +173,11 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 if (token != null)
                 {
                     var credential = CrossFirebaseAuth.Current
+                                                      .Instance
                                                       .GitHubAuthProvider
                                                       .GetCredential(token);
 
-                    var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
+                    var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
 
                     await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
                 }
@@ -200,7 +204,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         {
             try
             {
-                var result = await CrossFirebaseAuth.Current.SignInAnonymouslyAsync();
+                var result = await CrossFirebaseAuth.Current.Instance.SignInAnonymouslyAsync();
 
                 await _pageDialogService.DisplayAlertAsync("Success", null, "OK");
             }

@@ -64,7 +64,7 @@ namespace Plugin.FirebaseAuth.Sample.Extensins
             return tcs.Task;
         }
 
-        public static Task<bool> GoBackAsync<TResult>(this INavigationService navigationService, TResult result)
+        public static Task<INavigationResult> GoBackAsync<TResult>(this INavigationService navigationService, TResult result)
         {
             var parameters = new NavigationParameters
             {

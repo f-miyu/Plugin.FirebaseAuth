@@ -23,7 +23,7 @@ namespace Plugin.FirebaseAuth.Sample.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            FirebaseAuth.Init();
+            Firebase.Core.App.Configure();
 
             Xamarin.Auth.Presenters.XamarinIOS.AuthenticationConfiguration.Init();
 

@@ -28,12 +28,12 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
             {
                 try
                 {
-                    var verificationResult = await CrossFirebaseAuth.Current.PhoneAuthProvider
+                    var verificationResult = await CrossFirebaseAuth.Current.Instance.PhoneAuthProvider
                                                                     .VerifyPhoneNumberAsync(PhoneNumber.Value);
 
                     if (verificationResult.Credential != null)
                     {
-                        var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(verificationResult.Credential);
+                        var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(verificationResult.Credential);
 
                         await NavigationService.GoBackAsync(result);
                     }
@@ -43,9 +43,9 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
                         if (verificationCode != null)
                         {
-                            var credential = CrossFirebaseAuth.Current.PhoneAuthProvider.GetCredential(verificationResult.VerificationId, verificationCode);
+                            var credential = CrossFirebaseAuth.Current.Instance.PhoneAuthProvider.GetCredential(verificationResult.VerificationId, verificationCode);
 
-                            var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
+                            var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
 
                             await NavigationService.GoBackAsync(result);
                         }

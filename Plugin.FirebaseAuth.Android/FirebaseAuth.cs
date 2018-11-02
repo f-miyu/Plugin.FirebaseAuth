@@ -12,6 +12,8 @@ namespace Plugin.FirebaseAuth
 
         internal static Activity CurrentActivity => _currentActivityFactory?.Invoke();
 
+        public static string DefaultAppName { get; set; }
+
         public static long VerifyingPhoneNumberTimeout { get; set; } = 60;
 
         public static void Init(Func<Activity> currentActivityFactory)

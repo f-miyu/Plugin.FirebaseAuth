@@ -95,6 +95,7 @@
     <Compile Include="OAuthProviderWrapper.cs" />
     <Compile Include="ActionCodeSettingsExtensions.cs" />
     <Compile Include="OnCompleteHandler.cs" />
+    <Compile Include="InstanceWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

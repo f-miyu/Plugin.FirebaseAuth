@@ -35,11 +35,12 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 try
                 {
                     var result = await CrossFirebaseAuth.Current
+                                                        .Instance
                                                         .CreateUserWithEmailAndPasswordAsync(Email.Value, Password.Value);
 
                     await result.User.UpdateProfileAsync(new UserProfileChangeRequest { DisplayName = Name.Value });
 
-                    var user = CrossFirebaseAuth.Current.CurrentUser;
+                    var user = CrossFirebaseAuth.Current.Instance.CurrentUser;
 
                     await user.SendEmailVerificationAsync();
 

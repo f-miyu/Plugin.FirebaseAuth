@@ -46,26 +46,26 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
             Title = "User";
 
-            _user.Value = CrossFirebaseAuth.Current.CurrentUser;
+            _user.Value = CrossFirebaseAuth.Current.Instance.CurrentUser;
 
             Name = new ReactivePropertySlim<string>(_user.Value?.DisplayName);
             Email = new ReactivePropertySlim<string>(_user.Value?.Email);
             PhoneNumber = new ReactivePropertySlim<string>(_user.Value?.PhoneNumber);
 
             IsLinkedWithGoogle = _user.Where(user => user != null)
-                                      .Select(user => user.ProviderData.FirstOrDefault(data => data.ProviderId == CrossFirebaseAuth.Current.GoogleAuthProvider.ProviderId) != null)
+                                      .Select(user => user.ProviderData.FirstOrDefault(data => data.ProviderId == CrossFirebaseAuth.Current.Instance.GoogleAuthProvider.ProviderId) != null)
                                       .ToReadOnlyReactivePropertySlim();
 
             IsLinkedWithTwitter = _user.Where(user => user != null)
-                                       .Select(user => user.ProviderData.FirstOrDefault(data => data.ProviderId == CrossFirebaseAuth.Current.TwitterAuthProvider.ProviderId) != null)
+                                       .Select(user => user.ProviderData.FirstOrDefault(data => data.ProviderId == CrossFirebaseAuth.Current.Instance.TwitterAuthProvider.ProviderId) != null)
                                        .ToReadOnlyReactivePropertySlim();
 
             IsLinkedWithFacebook = _user.Where(user => user != null)
-                                        .Select(user => user.ProviderData.FirstOrDefault(data => data.ProviderId == CrossFirebaseAuth.Current.FacebookAuthProvider.ProviderId) != null)
+                                        .Select(user => user.ProviderData.FirstOrDefault(data => data.ProviderId == CrossFirebaseAuth.Current.Instance.FacebookAuthProvider.ProviderId) != null)
                                         .ToReadOnlyReactivePropertySlim();
 
             IsLinkedWithGitHub = _user.Where(user => user != null)
-                                      .Select(user => user.ProviderData.FirstOrDefault(data => data.ProviderId == CrossFirebaseAuth.Current.GitHubAuthProvider.ProviderId) != null)
+                                      .Select(user => user.ProviderData.FirstOrDefault(data => data.ProviderId == CrossFirebaseAuth.Current.Instance.GitHubAuthProvider.ProviderId) != null)
                                       .ToReadOnlyReactivePropertySlim();
 
             _user.Where(user => user != null)
@@ -139,7 +139,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
             try
             {
-                var verificationResult = await CrossFirebaseAuth.Current.PhoneAuthProvider
+                var verificationResult = await CrossFirebaseAuth.Current.Instance.PhoneAuthProvider
                                                                 .VerifyPhoneNumberAsync(PhoneNumber.Value);
 
                 if (verificationResult.Credential != null)
@@ -154,7 +154,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
                     if (verificationCode != null)
                     {
-                        var credential = CrossFirebaseAuth.Current.PhoneAuthProvider.GetCredential(verificationResult.VerificationId, verificationCode);
+                        var credential = CrossFirebaseAuth.Current.Instance.PhoneAuthProvider.GetCredential(verificationResult.VerificationId, verificationCode);
 
                         await user.UpdatePhoneNumberAsync(credential);
 
@@ -174,7 +174,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         {
             try
             {
-                CrossFirebaseAuth.Current.SignOut();
+                CrossFirebaseAuth.Current.Instance.SignOut();
 
                 await NavigationService.GoBackAsync();
             }
@@ -198,6 +198,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 if (idToken != null)
                 {
                     var credential = CrossFirebaseAuth.Current
+                                                      .Instance
                                                       .GoogleAuthProvider
                                                       .GetCredential(idToken, accessToken);
 
@@ -223,7 +224,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
             try
             {
-                var result = await user.UnlinkAsync(CrossFirebaseAuth.Current.GoogleAuthProvider.ProviderId);
+                var result = await user.UnlinkAsync(CrossFirebaseAuth.Current.Instance.GoogleAuthProvider.ProviderId);
 
                 _user.Value = result;
 
@@ -249,6 +250,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 if (token != null && secret != null)
                 {
                     var credential = CrossFirebaseAuth.Current
+                                                      .Instance
                                                       .TwitterAuthProvider
                                                       .GetCredential(token, secret);
 
@@ -274,7 +276,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
             try
             {
-                var result = await user.UnlinkAsync(CrossFirebaseAuth.Current.TwitterAuthProvider.ProviderId);
+                var result = await user.UnlinkAsync(CrossFirebaseAuth.Current.Instance.TwitterAuthProvider.ProviderId);
 
                 _user.Value = result;
 
@@ -300,6 +302,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 if (accessToken != null)
                 {
                     var credential = CrossFirebaseAuth.Current
+                                                      .Instance
                                                       .FacebookAuthProvider
                                                       .GetCredential(accessToken);
 
@@ -325,7 +328,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
             try
             {
-                var result = await user.UnlinkAsync(CrossFirebaseAuth.Current.FacebookAuthProvider.ProviderId);
+                var result = await user.UnlinkAsync(CrossFirebaseAuth.Current.Instance.FacebookAuthProvider.ProviderId);
 
                 _user.Value = result;
 
@@ -351,6 +354,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 if (accessToken != null)
                 {
                     var credential = CrossFirebaseAuth.Current
+                                                      .Instance
                                                       .GitHubAuthProvider
                                                       .GetCredential(accessToken);
 
@@ -376,7 +380,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
             try
             {
-                var result = await user.UnlinkAsync(CrossFirebaseAuth.Current.GitHubAuthProvider.ProviderId);
+                var result = await user.UnlinkAsync(CrossFirebaseAuth.Current.Instance.GitHubAuthProvider.ProviderId);
 
                 _user.Value = result;
 

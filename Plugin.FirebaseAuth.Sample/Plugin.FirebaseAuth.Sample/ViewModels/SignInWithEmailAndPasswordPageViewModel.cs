@@ -35,7 +35,8 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 try
                 {
                     var result = await CrossFirebaseAuth.Current
-                                                        .SignInWithEmailAndPasswordAsync(Email.Value, Password.Value);                                 
+                                                        .Instance
+                                                        .SignInWithEmailAndPasswordAsync(Email.Value, Password.Value);
 
                     await NavigationService.GoBackAsync(result.User);
                 }
@@ -57,6 +58,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 try
                 {
                     await CrossFirebaseAuth.Current
+                                           .Instance
                                            .SendPasswordResetEmailAsync(Email.Value);
 
                     await _pageDialogService.DisplayAlertAsync(null, "Email has been sent.", "OK");
