@@ -9,36 +9,36 @@ namespace Plugin.FirebaseAuth
 {
     public class UserWrapper : IUser
     {
-        internal User User { get; }
+        private readonly User _user;
 
         public UserWrapper(User user)
         {
-            User = user;
+            _user = user;
         }
 
-        public string DisplayName => User.DisplayName;
+        public string DisplayName => _user.DisplayName;
 
-        public string Email => User.Email;
+        public string Email => _user.Email;
 
-        public bool IsAnonymous => User.IsAnonymous;
+        public bool IsAnonymous => _user.IsAnonymous;
 
-        public string PhoneNumber => User.PhoneNumber;
+        public string PhoneNumber => _user.PhoneNumber;
 
-        public Uri PhotoUrl => User.PhotoUrl != null ? new Uri(User.PhotoUrl.AbsoluteString) : null;
+        public Uri PhotoUrl => _user.PhotoUrl != null ? new Uri(_user.PhotoUrl.AbsoluteString) : null;
 
-        public IEnumerable<IUserInfo> ProviderData => User.ProviderData.Select(userInfo => new UserInfoWrapper(userInfo));
+        public IEnumerable<IUserInfo> ProviderData => _user.ProviderData.Select(userInfo => new UserInfoWrapper(userInfo));
 
-        public string ProviderId => User.ProviderId;
+        public string ProviderId => _user.ProviderId;
 
-        public string Uid => User.Uid;
+        public string Uid => _user.Uid;
 
-        public bool IsEmailVerified => User.IsEmailVerified;
+        public bool IsEmailVerified => _user.IsEmailVerified;
 
         public async Task DeleteAsync()
         {
             try
             {
-                await User.DeleteAsync().ConfigureAwait(false);
+                await _user.DeleteAsync().ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -50,7 +50,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                return await User.GetIdTokenAsync(forceRefresh).ConfigureAwait(false);
+                return await _user.GetIdTokenAsync(forceRefresh).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -63,7 +63,7 @@ namespace Plugin.FirebaseAuth
             try
             {
                 var wrapper = (AuthCredentialWrapper)credential;
-                var result = await User.LinkAndRetrieveDataAsync(wrapper.AuthCredential).ConfigureAwait(false);
+                var result = await _user.LinkAndRetrieveDataAsync((AuthCredential)wrapper).ConfigureAwait(false);
                 return new AuthResultWrapper(result);
             }
             catch (NSErrorException e)
@@ -77,7 +77,7 @@ namespace Plugin.FirebaseAuth
             try
             {
                 var wrapper = (AuthCredentialWrapper)credential;
-                var result = await User.ReauthenticateAndRetrieveDataAsync(wrapper.AuthCredential).ConfigureAwait(false);
+                var result = await _user.ReauthenticateAndRetrieveDataAsync((AuthCredential)wrapper).ConfigureAwait(false);
                 return new AuthResultWrapper(result);
             }
             catch (NSErrorException e)
@@ -90,7 +90,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await User.ReloadAsync().ConfigureAwait(false);
+                await _user.ReloadAsync().ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -102,7 +102,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await User.SendEmailVerificationAsync().ConfigureAwait(false);
+                await _user.SendEmailVerificationAsync().ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -114,7 +114,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await User.SendEmailVerificationAsync(actionCodeSettings.ToNative()).ConfigureAwait(false);
+                await _user.SendEmailVerificationAsync(actionCodeSettings.ToNative()).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -126,7 +126,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var result = await User.UnlinkAsync(providerId).ConfigureAwait(false);
+                var result = await _user.UnlinkAsync(providerId).ConfigureAwait(false);
                 return new UserWrapper(result);
             }
             catch (NSErrorException e)
@@ -139,7 +139,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await User.UpdateEmailAsync(email).ConfigureAwait(false);
+                await _user.UpdateEmailAsync(email).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -151,7 +151,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await User.UpdatePasswordAsync(password).ConfigureAwait(false);
+                await _user.UpdatePasswordAsync(password).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -164,7 +164,7 @@ namespace Plugin.FirebaseAuth
             try
             {
                 var wrapper = (PhoneAuthCredentialWrapper)credential;
-                await User.UpdatePhoneNumberCredentialAsync(wrapper.PhoneAuthCredential).ConfigureAwait(false);
+                await _user.UpdatePhoneNumberCredentialAsync((PhoneAuthCredential)wrapper).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -176,7 +176,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var userProfileChangeRequest = User.ProfileChangeRequest();
+                var userProfileChangeRequest = _user.ProfileChangeRequest();
                 if (request.IsDisplayNameChanged)
                 {
                     userProfileChangeRequest.DisplayName = request.DisplayName;

@@ -4,7 +4,7 @@ namespace Plugin.FirebaseAuth
 {
     public interface IFirebaseAuth
     {
-        IInstance Instance { get; }
-        IInstance GetInstance(string appName);
+        IAuth Instance { get; }
+        IAuth GetInstance(string appName);
     }
 }

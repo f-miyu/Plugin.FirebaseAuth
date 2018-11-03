@@ -4,11 +4,16 @@ namespace Plugin.FirebaseAuth
 {
     public class PhoneAuthCredentialWrapper : AuthCredentialWrapper, IPhoneAuthCredential
     {
-        internal PhoneAuthCredential PhoneAuthCredential { get; }
+        private readonly PhoneAuthCredential _phoneAuthCredential;
 
         public PhoneAuthCredentialWrapper(PhoneAuthCredential phoneAuthCredential) : base(phoneAuthCredential)
         {
-            PhoneAuthCredential = phoneAuthCredential;
+            _phoneAuthCredential = phoneAuthCredential;
+        }
+
+        public static explicit operator PhoneAuthCredential(PhoneAuthCredentialWrapper wrapper)
+        {
+            return wrapper._phoneAuthCredential;
         }
     }
 }

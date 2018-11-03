@@ -8,28 +8,28 @@ namespace Plugin.FirebaseAuth
 {
     public class AdditionalUserInfoWrapper : IAdditionalUserInfo
     {
-        internal Firebase.Auth.IAdditionalUserInfo AdditionalUserInfo { get; }
+        private readonly Firebase.Auth.IAdditionalUserInfo _additionalUserInfo;
 
         private IDictionary<string, object> _profile;
         public IDictionary<string, object> Profile
         {
             get
             {
-                if (AdditionalUserInfo.Profile != null && _profile == null)
+                if (_additionalUserInfo.Profile != null && _profile == null)
                 {
-                    _profile = AdditionalUserInfo.Profile.ToDictionary(pair => pair.Key, pair => ConvertProfileValue(pair.Value));
+                    _profile = _additionalUserInfo.Profile.ToDictionary(pair => pair.Key, pair => ConvertProfileValue(pair.Value));
                 }
                 return _profile;
             }
         }
 
-        public string ProviderId => AdditionalUserInfo.ProviderId;
+        public string ProviderId => _additionalUserInfo.ProviderId;
 
-        public string Username => AdditionalUserInfo.Username;
+        public string Username => _additionalUserInfo.Username;
 
         public AdditionalUserInfoWrapper(Firebase.Auth.IAdditionalUserInfo additionalUserInfo)
         {
-            AdditionalUserInfo = additionalUserInfo;
+            _additionalUserInfo = additionalUserInfo;
         }
 
         private object ConvertProfileValue(Java.Lang.Object profileValue)

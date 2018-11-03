@@ -4,16 +4,16 @@ namespace Plugin.FirebaseAuth
 {
     public class AuthResultWrapper : IAuthResult
     {
-        internal AuthDataResult AuthResult { get; }
+        private readonly AuthDataResult _authResult;
 
         private IAdditionalUserInfo _additionalUserInfo;
         public IAdditionalUserInfo AdditionalUserInfo
         {
             get
             {
-                if (AuthResult.AdditionalUserInfo != null && _additionalUserInfo == null)
+                if (_authResult.AdditionalUserInfo != null && _additionalUserInfo == null)
                 {
-                    _additionalUserInfo = new AdditionalUserInfoWrapper(AuthResult.AdditionalUserInfo);
+                    _additionalUserInfo = new AdditionalUserInfoWrapper(_authResult.AdditionalUserInfo);
                 }
                 return _additionalUserInfo;
             }
@@ -24,9 +24,9 @@ namespace Plugin.FirebaseAuth
         {
             get
             {
-                if (AuthResult.User != null && _user == null)
+                if (_authResult.User != null && _user == null)
                 {
-                    _user = new UserWrapper(AuthResult.User);
+                    _user = new UserWrapper(_authResult.User);
                 }
                 return _user;
             }
@@ -34,7 +34,7 @@ namespace Plugin.FirebaseAuth
 
         public AuthResultWrapper(AuthDataResult authResult)
         {
-            AuthResult = authResult;
+            _authResult = authResult;
         }
     }
 }

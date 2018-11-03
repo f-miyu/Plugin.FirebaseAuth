@@ -6,7 +6,7 @@ namespace Plugin.FirebaseAuth
     public delegate void AuthStateChangedHandler(IUser user);
     public delegate void IdTokenChangedHandler(IUser user);
 
-    public interface IInstance
+    public interface IAuth
     {
         IEmailAuthProvider EmailAuthProvider { get; }
         IGoogleAuthProvider GoogleAuthProvider { get; }

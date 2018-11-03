@@ -3,23 +3,23 @@ namespace Plugin.FirebaseAuth
 {
     public class UserInfoWrapper : IUserInfo
     {
-        internal Firebase.Auth.IUserInfo UserInfo { get; }
+        private readonly Firebase.Auth.IUserInfo _userInfo;
 
-        public string DisplayName => UserInfo.DisplayName;
+        public string DisplayName => _userInfo.DisplayName;
 
-        public string Email => UserInfo.Email;
+        public string Email => _userInfo.Email;
 
-        public string PhoneNumber => UserInfo.PhoneNumber;
+        public string PhoneNumber => _userInfo.PhoneNumber;
 
-        public Uri PhotoUrl => UserInfo.PhotoUrl != null ? new Uri(UserInfo.PhotoUrl.ToString()) : null;
+        public Uri PhotoUrl => _userInfo.PhotoUrl != null ? new Uri(_userInfo.PhotoUrl.ToString()) : null;
 
-        public string ProviderId => UserInfo.ProviderId;
+        public string ProviderId => _userInfo.ProviderId;
 
-        public string Uid => UserInfo.Uid;
+        public string Uid => _userInfo.Uid;
 
         public UserInfoWrapper(Firebase.Auth.IUserInfo userInfo)
         {
-            UserInfo = userInfo;
+            _userInfo = userInfo;
         }
     }
 }

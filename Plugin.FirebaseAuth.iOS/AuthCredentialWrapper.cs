@@ -4,13 +4,18 @@ namespace Plugin.FirebaseAuth
 {
     public class AuthCredentialWrapper : IAuthCredential
     {
-        internal AuthCredential AuthCredential { get; }
+        private readonly AuthCredential _authCredential;
 
-        public string Provider => AuthCredential.Provider;
+        public string Provider => _authCredential.Provider;
 
         public AuthCredentialWrapper(AuthCredential authCredential)
         {
-            AuthCredential = authCredential;
+            _authCredential = authCredential;
+        }
+
+        public static explicit operator AuthCredential(AuthCredentialWrapper wrapper)
+        {
+            return wrapper._authCredential;
         }
     }
 }

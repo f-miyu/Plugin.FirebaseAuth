@@ -8,17 +8,17 @@ namespace Plugin.FirebaseAuth
 {
     public class AdditionalUserInfoWrapper : IAdditionalUserInfo
     {
-        internal AdditionalUserInfo AdditionalUserInfo { get; }
+        private readonly AdditionalUserInfo _additionalUserInfo;
 
         private IDictionary<string, object> _profile;
         public IDictionary<string, object> Profile
         {
             get
             {
-                if (AdditionalUserInfo.Profile != null && _profile == null)
+                if (_additionalUserInfo.Profile != null && _profile == null)
                 {
                     _profile = new Dictionary<string, Object>();
-                    foreach (var (key, value) in AdditionalUserInfo.Profile)
+                    foreach (var (key, value) in _additionalUserInfo.Profile)
                     {
                         _profile[key.ToString()] = ConvertProfileValue(value);
                     }
@@ -27,13 +27,13 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public string ProviderId => AdditionalUserInfo.ProviderId;
+        public string ProviderId => _additionalUserInfo.ProviderId;
 
-        public string Username => AdditionalUserInfo.Username;
+        public string Username => _additionalUserInfo.Username;
 
         public AdditionalUserInfoWrapper(AdditionalUserInfo additionalUserInfo)
         {
-            AdditionalUserInfo = additionalUserInfo;
+            _additionalUserInfo = additionalUserInfo;
         }
 
         private object ConvertProfileValue(NSObject profileValue)

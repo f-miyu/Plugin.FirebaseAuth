@@ -2,10 +2,11 @@
 using System.Threading.Tasks;
 using Firebase;
 using System.Linq;
+using Firebase.Auth;
 
 namespace Plugin.FirebaseAuth
 {
-    public class InstanceWrapper : IInstance
+    public class AuthWrapper : IAuth
     {
         public IEmailAuthProvider EmailAuthProvider { get; } = new EmailAuthProviderWrapper();
 
@@ -21,39 +22,26 @@ namespace Plugin.FirebaseAuth
 
         public IOAuthProvider OAuthProvider { get; } = new OAuthProviderWrapper();
 
-        public IUser CurrentUser => _instance.CurrentUser != null ? new UserWrapper(_instance.CurrentUser) : null;
+        public IUser CurrentUser => _auth.CurrentUser != null ? new UserWrapper(_auth.CurrentUser) : null;
 
         public string LanguageCode
         {
-            get => _instance.LanguageCode;
-            set => _instance.LanguageCode = value;
+            get => _auth.LanguageCode;
+            set => _auth.LanguageCode = value;
         }
 
-        private readonly Firebase.Auth.FirebaseAuth _instance;
+        private readonly Firebase.Auth.FirebaseAuth _auth;
 
-        public InstanceWrapper(string appName = null)
+        public AuthWrapper(Firebase.Auth.FirebaseAuth auth)
         {
-            if (!string.IsNullOrEmpty(appName))
-            {
-                var app = FirebaseApp.GetInstance(appName);
-                _instance = Firebase.Auth.FirebaseAuth.GetInstance(app);
-            }
-            else if (!string.IsNullOrEmpty(FirebaseAuth.DefaultAppName))
-            {
-                var app = FirebaseApp.GetInstance(FirebaseAuth.DefaultAppName);
-                _instance = Firebase.Auth.FirebaseAuth.GetInstance(app);
-            }
-            else
-            {
-                _instance = Firebase.Auth.FirebaseAuth.Instance;
-            }
+            _auth = auth;
         }
 
         public async Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password)
         {
             try
             {
-                var result = await _instance.CreateUserWithEmailAndPasswordAsync(email, password).ConfigureAwait(false);
+                var result = await _auth.CreateUserWithEmailAndPasswordAsync(email, password).ConfigureAwait(false);
                 return new AuthResultWrapper(result);
             }
             catch (FirebaseException e)
@@ -66,7 +54,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var result = await _instance.SignInAnonymouslyAsync().ConfigureAwait(false);
+                var result = await _auth.SignInAnonymouslyAsync().ConfigureAwait(false);
                 return new AuthResultWrapper(result);
             }
             catch (FirebaseException e)
@@ -80,7 +68,7 @@ namespace Plugin.FirebaseAuth
             try
             {
                 var wrapper = (AuthCredentialWrapper)credential;
-                var result = await _instance.SignInWithCredentialAsync(wrapper.AuthCredential).ConfigureAwait(false);
+                var result = await _auth.SignInWithCredentialAsync((AuthCredential)wrapper).ConfigureAwait(false);
                 return new AuthResultWrapper(result);
             }
             catch (FirebaseException e)
@@ -93,7 +81,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var result = await _instance.SignInWithCustomTokenAsync(token).ConfigureAwait(false);
+                var result = await _auth.SignInWithCustomTokenAsync(token).ConfigureAwait(false);
                 return new UserWrapper(result.User);
             }
             catch (FirebaseException e)
@@ -106,7 +94,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var result = await _instance.SignInWithEmailAndPasswordAsync(email, password).ConfigureAwait(false);
+                var result = await _auth.SignInWithEmailAndPasswordAsync(email, password).ConfigureAwait(false);
                 return new AuthResultWrapper(result);
             }
             catch (FirebaseException e)
@@ -119,7 +107,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var result = await _instance.FetchProvidersForEmailAsync(email).ConfigureAwait(false);
+                var result = await _auth.FetchProvidersForEmailAsync(email).ConfigureAwait(false);
                 return result.Providers.ToArray();
             }
             catch (FirebaseException e)
@@ -132,7 +120,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await _instance.SendPasswordResetEmailAsync(email).ConfigureAwait(false);
+                await _auth.SendPasswordResetEmailAsync(email).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -144,7 +132,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await _instance.SendPasswordResetEmailAsync(email, actionCodeSettings.ToNative()).ConfigureAwait(false);
+                await _auth.SendPasswordResetEmailAsync(email, actionCodeSettings.ToNative()).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -156,7 +144,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await _instance.ApplyActionCodeAsync(code).ConfigureAwait(false);
+                await _auth.ApplyActionCodeAsync(code).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -168,7 +156,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await _instance.CheckActionCodeAsync(code).ConfigureAwait(false);
+                await _auth.CheckActionCodeAsync(code).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -180,7 +168,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await _instance.ConfirmPasswordResetAsync(code, newPassword).ConfigureAwait(false);
+                await _auth.ConfirmPasswordResetAsync(code, newPassword).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -192,7 +180,7 @@ namespace Plugin.FirebaseAuth
         {
             var tcs = new TaskCompletionSource<string>();
 
-            _instance.VerifyPasswordResetCode(code).AddOnCompleteListener(new OnCompleteHandlerListener(task =>
+            _auth.VerifyPasswordResetCode(code).AddOnCompleteListener(new OnCompleteHandlerListener(task =>
             {
                 if (task.IsSuccessful)
                 {
@@ -217,7 +205,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                _instance.SignOut();
+                _auth.SignOut();
             }
             catch (FirebaseException e)
             {
@@ -227,17 +215,17 @@ namespace Plugin.FirebaseAuth
 
         public void UseAppLanguage()
         {
-            _instance.UseAppLanguage();
+            _auth.UseAppLanguage();
         }
 
         public IListenerRegistration AddAuthStateChangedListener(AuthStateChangedHandler listener)
         {
-            return new AuthStateChangedListenerRegistration(_instance, listener);
+            return new AuthStateChangedListenerRegistration(_auth, listener);
         }
 
         public IListenerRegistration AddIdTokenChangedListener(IdTokenChangedHandler listener)
         {
-            return new IdTokenChangedListenerRegistration(_instance, listener);
+            return new IdTokenChangedListenerRegistration(_auth, listener);
         }
 
         private class AuthStateChangedListenerRegistration : IListenerRegistration
