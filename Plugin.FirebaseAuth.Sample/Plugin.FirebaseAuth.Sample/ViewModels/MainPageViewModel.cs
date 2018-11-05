@@ -95,7 +95,6 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 if (idToken != null)
                 {
                     var credential = CrossFirebaseAuth.Current
-                                                      .Instance
                                                       .GoogleAuthProvider
                                                       .GetCredential(idToken, accessToken);
 
@@ -121,7 +120,6 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 if (token != null && secret != null)
                 {
                     var credential = CrossFirebaseAuth.Current
-                                                      .Instance
                                                       .TwitterAuthProvider
                                                       .GetCredential(token, secret);
 
@@ -147,7 +145,6 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 if (accessToken != null)
                 {
                     var credential = CrossFirebaseAuth.Current
-                                                      .Instance
                                                       .FacebookAuthProvider
                                                       .GetCredential(accessToken);
 
@@ -173,7 +170,6 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                 if (token != null)
                 {
                     var credential = CrossFirebaseAuth.Current
-                                                      .Instance
                                                       .GitHubAuthProvider
                                                       .GetCredential(token);
 

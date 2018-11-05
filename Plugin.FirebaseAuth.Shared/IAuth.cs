@@ -8,13 +8,6 @@ namespace Plugin.FirebaseAuth
 
     public interface IAuth
     {
-        IEmailAuthProvider EmailAuthProvider { get; }
-        IGoogleAuthProvider GoogleAuthProvider { get; }
-        IFacebookAuthProvider FacebookAuthProvider { get; }
-        ITwitterAuthProvider TwitterAuthProvider { get; }
-        IGitHubAuthProvider GitHubAuthProvider { get; }
-        IPhoneAuthProvider PhoneAuthProvider { get; }
-        IOAuthProvider OAuthProvider { get; }
         IUser CurrentUser { get; }
         string LanguageCode { get; set; }
         Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password);
