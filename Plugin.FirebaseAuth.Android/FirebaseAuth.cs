@@ -2,23 +2,36 @@
 using Android.App;
 using Android.OS;
 using Firebase.Auth;
+using Android.Content;
 
 namespace Plugin.FirebaseAuth
 {
     public static class FirebaseAuth
     {
+        public static readonly string DefaultAppName = "[FirebasePlugin]";
+
         private static Func<Activity> _currentActivityFactory;
         private static ActivityLifecycleCallbacks _callbacks;
 
         internal static Activity CurrentActivity => _currentActivityFactory?.Invoke();
 
-        public static string DefaultAppName { get; set; }
-
         public static long VerifyingPhoneNumberTimeout { get; set; } = 60;
 
-        public static void Init(Func<Activity> currentActivityFactory)
+        public static void Init(Context context, Func<Activity> currentActivityFactory)
         {
             _currentActivityFactory = currentActivityFactory;
+
+            try
+            {
+                Firebase.FirebaseApp.GetInstance(DefaultAppName);
+            }
+            catch (Exception)
+            {
+                var baseOptions = Firebase.FirebaseOptions.FromResource(context);
+                var options = new Firebase.FirebaseOptions.Builder(baseOptions).SetProjectId(baseOptions.StorageBucket.Split('.')[0]).Build();
+
+                Firebase.FirebaseApp.InitializeApp(context, options, DefaultAppName);
+            }
         }
 
         public static void Init(Application application)
@@ -28,7 +41,8 @@ namespace Plugin.FirebaseAuth
 
             _callbacks = new ActivityLifecycleCallbacks();
             application.RegisterActivityLifecycleCallbacks(_callbacks);
-            _currentActivityFactory = () => _callbacks.CurrentActivit;
+
+            Init(application, () => _callbacks.CurrentActivit);
         }
 
         public static void Init(Activity activity)
@@ -38,7 +52,8 @@ namespace Plugin.FirebaseAuth
 
             _callbacks = new ActivityLifecycleCallbacks(activity);
             activity.Application.RegisterActivityLifecycleCallbacks(_callbacks);
-            _currentActivityFactory = () => _callbacks.CurrentActivit;
+
+            Init(activity, () => _callbacks.CurrentActivit);
         }
 
         private class ActivityLifecycleCallbacks : Java.Lang.Object, Application.IActivityLifecycleCallbacks

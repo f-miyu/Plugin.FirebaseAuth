@@ -10,17 +10,8 @@ namespace Plugin.FirebaseAuth
         {
             get
             {
-                Firebase.Auth.FirebaseAuth auth;
-                if (string.IsNullOrEmpty(FirebaseAuth.DefaultAppName))
-                {
-                    auth = Firebase.Auth.FirebaseAuth.Instance;
-                }
-                else
-                {
-                    var app = FirebaseApp.GetInstance(FirebaseAuth.DefaultAppName);
-                    auth = Firebase.Auth.FirebaseAuth.GetInstance(app);
-                }
-                return new AuthWrapper(auth);
+                var app = FirebaseApp.GetInstance(FirebaseAuth.DefaultAppName);
+                return new AuthWrapper(Firebase.Auth.FirebaseAuth.GetInstance(app));
             }
         }
 
