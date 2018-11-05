@@ -13,7 +13,7 @@ Install Nuget package to each projects.
 * Add GoogleService-Info.plist to iOS project. Select BundleResource as build action.
 * Initialize as follows in AppDelegate. 
 ```C#
-Plugin.FirebaseAuth.FirebaseAuth.Init();
+Firebase.Core.App.Configure();
 ```
 
 ### Android
@@ -26,64 +26,64 @@ Plugin.FirebaseAuth.FirebaseAuth.Init(this);
 ## Usage
 ### Sign up
 ```C#
-var result = await CrossFirebaseAuth.Current.CreateUserWithEmailAndPasswordAsync(email, password);
+var result = await CrossFirebaseAuth.Current.Instance.CreateUserWithEmailAndPasswordAsync(email, password);
 ```
 
 ### Sign in with email and password
 ```C#
-var result = await CrossFirebaseAuth.Current.SignInWithEmailAndPasswordAsync(email, password); 
+var result = await CrossFirebaseAuth.Current.Instance.SignInWithEmailAndPasswordAsync(email, password); 
 ```
 
 ### Sign in with Google
 ```C#
 var credential = CrossFirebaseAuth.Current.GoogleAuthProvider.GetCredential(idToken, accessToken);
-var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
+var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
 ```
 
 ### Sign in with Facebook
 ```C#
 var credential = CrossFirebaseAuth.Current.FacebookAuthProvider.GetCredential(accessToken);
-var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
+var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
 ```
 
 ### Sign in with Twitter
 ```C#
 var credential = CrossFirebaseAuth.Current.TwitterAuthProvider.GetCredential(token, secret);
-var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
+var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
 ```
 
 ### Sign in with GitHub
 ```C#
 var credential = CrossFirebaseAuth.Current.GitHubAuthProvider.GetCredential(token);
-var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
+var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
 ```
 
 ### Sign in with phone number
 ```C#
-var verificationResult = await CrossFirebaseAuth.Current.PhoneAuthProvider.VerifyPhoneNumberAsync(phoneNumber);
+var verificationResult = await CrossFirebaseAuth.Current.PhoneAuthProvider.VerifyPhoneNumberAsync(CrossFirebaseAuth.Current.Instance, phoneNumber);
 
-var credential = CrossFirebaseAuth.Current.PhoneAuthProvider.GetCredential(verificationResult.VerificationId, verificationCode);
-var result = await CrossFirebaseAuth.Current.SignInWithCredentialAsync(credential);
+var credential = CrossFirebaseAuth.Current.PhoneAuthProvider.GetCredential(CrossFirebaseAuth.Current.Instance, verificationResult.VerificationId, verificationCode);
+var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
 ```
 
 ### Sign in with custom token
 ```C#
-var user = await CrossFirebaseAuth.Current.SignInWithCustomTokenAsync(token);
+var user = await CrossFirebaseAuth.Current.Instance.SignInWithCustomTokenAsync(token);
 ```
 
 ### Sign in anonymously
 ```C#
-var result = await CrossFirebaseAuth.Current.SignInAnonymouslyAsync()
+var result = await CrossFirebaseAuth.Current.Instance.SignInAnonymouslyAsync()
 ```
 
 ### Get the currently signed-in user
 ```C#
-var registration = CrossFirebaseAuth.Current.AddAuthStateChangedListener(user =>
+var registration = CrossFirebaseAuth.Current.Instance.AddAuthStateChangedListener(user =>
 {
     //...
 });
 
-var user = CrossFirebaseAuth.Current.CurrentUser;
+var user = CrossFirebaseAuth.Current.Instance.CurrentUser;
 ```
 
 ### Update a user's profile
@@ -93,49 +93,49 @@ var request = new UserProfileChangeRequest
     DisplayName = displayName,
     PhotoUrl = photoUrl
 };
-await CrossFirebaseAuth.Current.CurrentUser.UpdateProfileAsync(request);
+await CrossFirebaseAuth.Current.Instance.CurrentUser.UpdateProfileAsync(request);
 ```
 
 ### Set a user's email address
 ```C#
-await CrossFirebaseAuth.Current.CurrentUser.UpdateEmailAsync(email);
+await CrossFirebaseAuth.Current.Instance.CurrentUser.UpdateEmailAsync(email);
 ```
 
 ### Send a user a verification email
 ```C#
-await CrossFirebaseAuth.Current.CurrentUser.SendEmailVerificationAsync();
+await CrossFirebaseAuth.Current.Instance.CurrentUser.SendEmailVerificationAsync();
 ```
 
 ### Set a user's password
 ```C#
-await CrossFirebaseAuth.Current.CurrentUser.UpdatePasswordAsync(password);
+await CrossFirebaseAuth.Current.Instance.CurrentUser.UpdatePasswordAsync(password);
 ```
 
 ### Send a password reset email
 ```C#
-await CrossFirebaseAuth.Current.SendPasswordResetEmailAsync(email);
+await CrossFirebaseAuth.Current.Instance.SendPasswordResetEmailAsync(email);
 ```
 
 ### Delete a user
 ```C#
-await CrossFirebaseAuth.Current.CurrentUser.DeleteAsync();
+await CrossFirebaseAuth.Current.Instance.CurrentUser.DeleteAsync();
 ```
 
 ### Re-authenticate a user
 ```C#
 var credential = CrossFirebaseAuth.Current.EmailAuthProvider.GetCredential(email, password);
-await CrossFirebaseAuth.Current.CurrentUser.ReauthenticateAndRetrieveDataAsync(credential);
+await CrossFirebaseAuth.Current.Instance.CurrentUser.ReauthenticateAndRetrieveDataAsync(credential);
 ```
 
 ### Link
 ```C#
 var credential = CrossFirebaseAuth.Current.GoogleAuthProvider.GetCredential(idToken, accessToken);
-var result = await CrossFirebaseAuth.Current.CurrentUser.LinkWithCredentialAsync(credential);
+var result = await CrossFirebaseAuth.Current.Instance.CurrentUser.LinkWithCredentialAsync(credential);
 ```
 
 ### Unlink
 ```C#
-await CrossFirebaseAuth.Current.CurrentUser.UnlinkAsync(CrossFirebaseAuth.Current.GoogleAuthProvider.ProviderId);
+await CrossFirebaseAuth.Current.Instance.CurrentUser.UnlinkAsync(CrossFirebaseAuth.Current.GoogleAuthProvider.ProviderId);
 ```
 
 ### Action code settings
@@ -147,23 +147,28 @@ var actionCodeSettings = new ActionCodeSettings
     HandleCodeInApp = true
 };
 actionCodeSettings.SetAndroidPackageName(androidPackageName, true, null);
-await CrossFirebaseAuth.Current.CurrentUser.SendEmailVerificationAsync(actionCodeSettings);
+await CrossFirebaseAuth.Current.Instance.CurrentUser.SendEmailVerificationAsync(actionCodeSettings);
 ```
 
 ### Custom email action handlers
 Reset password
 ```C#
-var email = await CrossFirebaseAuth.Current.VerifyPasswordResetCodeAsync(code);
-await CrossFirebaseAuth.Current.ConfirmPasswordResetAsync(code, newPassword);
+var email = await CrossFirebaseAuth.Current.Instance.VerifyPasswordResetCodeAsync(code);
+await CrossFirebaseAuth.Current.Instance.ConfirmPasswordResetAsync(code, newPassword);
 ```
 
 Recover email
 ```C#
-await CrossFirebaseAuth.Current.CheckActionCodeAsync(code);
-await CrossFirebaseAuth.Current.ApplyActionCodeAsync(code);
+await CrossFirebaseAuth.Current.Instance.CheckActionCodeAsync(code);
+await CrossFirebaseAuth.Current.Instance.ApplyActionCodeAsync(code);
 ```
 
 Verify email
 ```C#
-await CrossFirebaseAuth.Current.ApplyActionCodeAsync(code);
+await CrossFirebaseAuth.Current.Instance.ApplyActionCodeAsync(code);
+```
+
+### Use multiple projects
+```C#
+var result = await CrossFirebaseAuth.Current.GetInstance("SecondAppName").CreateUserWithEmailAndPasswordAsync(email, password);
 ```
