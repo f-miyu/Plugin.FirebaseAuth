@@ -17,6 +17,11 @@ namespace Plugin.FirebaseAuth
 
         private readonly Auth _auth;
 
+        public static explicit operator Auth(AuthWrapper wrapper)
+        {
+            return wrapper._auth;
+        }
+
         public AuthWrapper(Auth auth)
         {
             _auth = auth;

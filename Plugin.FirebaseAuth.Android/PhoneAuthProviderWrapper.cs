@@ -12,20 +12,21 @@ namespace Plugin.FirebaseAuth
     {
         public string ProviderId => PhoneAuthProvider.ProviderId;
 
-        public IPhoneAuthCredential GetCredential(string verificationId, string smsCode)
+        public IPhoneAuthCredential GetCredential(IAuth auth, string verificationId, string smsCode)
         {
             var credential = PhoneAuthProvider.GetCredential(verificationId, smsCode);
             return new PhoneAuthCredentialWrapper(credential);
         }
 
-        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(string phoneNumber)
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber)
         {
             var activity = FirebaseAuth.CurrentActivity ?? throw new NullReferenceException("current activity is null");
 
             var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
             var callbacks = new Callbacks(tcs);
 
-            PhoneAuthProvider.Instance.VerifyPhoneNumber(phoneNumber, FirebaseAuth.VerifyingPhoneNumberTimeout, TimeUnit.Seconds, activity, callbacks);
+            var wrapper = (AuthWrapper)auth;
+            PhoneAuthProvider.GetInstance((Firebase.Auth.FirebaseAuth)wrapper).VerifyPhoneNumber(phoneNumber, FirebaseAuth.VerifyingPhoneNumberTimeout, TimeUnit.Seconds, activity, callbacks);
 
             return tcs.Task;
         }

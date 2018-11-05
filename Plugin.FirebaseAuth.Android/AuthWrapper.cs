@@ -23,6 +23,11 @@ namespace Plugin.FirebaseAuth
             _auth = auth;
         }
 
+        public static explicit operator Firebase.Auth.FirebaseAuth(AuthWrapper wrapper)
+        {
+            return wrapper._auth;
+        }
+
         public async Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password)
         {
             try

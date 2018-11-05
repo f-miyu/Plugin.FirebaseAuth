@@ -2,8 +2,6 @@
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Foundation;
-using ObjCRuntime;
-using UIKit;
 
 namespace Plugin.FirebaseAuth
 {
@@ -11,18 +9,22 @@ namespace Plugin.FirebaseAuth
     {
         public string ProviderId => PhoneAuthProvider.Id;
 
-        public IPhoneAuthCredential GetCredential(string verificationId, string verificationCode)
+        public IPhoneAuthCredential GetCredential(IAuth auth, string verificationId, string verificationCode)
         {
-            var credential = PhoneAuthProvider.DefaultInstance.GetCredential(verificationId, verificationCode);
+            var wrapper = (AuthWrapper)auth;
+            var credential = PhoneAuthProvider.From((Auth)wrapper).GetCredential(verificationId, verificationCode);
             return new PhoneAuthCredentialWrapper(credential);
         }
 
-        public async Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(string phoneNumber)
+        public async Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber)
         {
             try
             {
-                var verificationId = await PhoneAuthProvider.DefaultInstance.VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
-                                                              .ConfigureAwait(false);
+                var wrapper = (AuthWrapper)auth;
+                var verificationId = await PhoneAuthProvider.From((Auth)wrapper)
+                                                            .VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
+                                                            .ConfigureAwait(false);
+
                 return new PhoneNumberVerificationResult(null, verificationId);
             }
             catch (NSErrorException e)
