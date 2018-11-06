@@ -80,7 +80,7 @@ var result = await CrossFirebaseAuth.Current.Instance.SignInAnonymouslyAsync()
 ```C#
 var registration = CrossFirebaseAuth.Current.Instance.AddAuthStateChangedListener(user =>
 {
-    //...
+    ...
 });
 
 var user = CrossFirebaseAuth.Current.Instance.CurrentUser;
