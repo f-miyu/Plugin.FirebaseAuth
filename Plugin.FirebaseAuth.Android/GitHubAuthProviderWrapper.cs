@@ -6,6 +6,8 @@ namespace Plugin.FirebaseAuth
     {
         public string ProviderId => GithubAuthProvider.ProviderId;
 
+        public string GithubSignInMethod => GithubAuthProvider.GithubSignInMethod;
+
         public IAuthCredential GetCredential(string token)
         {
             var credential = GithubAuthProvider.GetCredential(token);

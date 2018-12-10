@@ -12,6 +12,8 @@ namespace Plugin.FirebaseAuth
     {
         public string ProviderId => PhoneAuthProvider.ProviderId;
 
+        public string PhoneSignInMethod => PhoneAuthProvider.PhoneSignInMethod;
+
         public IPhoneAuthCredential GetCredential(IAuth auth, string verificationId, string smsCode)
         {
             var credential = PhoneAuthProvider.GetCredential(verificationId, smsCode);

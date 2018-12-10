@@ -16,6 +16,11 @@ namespace Plugin.FirebaseAuth
             _user = user;
         }
 
+        public static explicit operator FirebaseUser(UserWrapper wrapper)
+        {
+            return wrapper._user;
+        }
+
         public string DisplayName => _user.DisplayName;
 
         public string Email => _user.Email;

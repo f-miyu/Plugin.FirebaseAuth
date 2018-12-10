@@ -6,6 +6,8 @@ namespace Plugin.FirebaseAuth
     {
         public string ProviderId => TwitterAuthProvider.ProviderId;
 
+        public string TwitterSignInMethod => TwitterAuthProvider.TwitterSignInMethod;
+
         public IAuthCredential GetCredential(string token, string secret)
         {
             var credential = TwitterAuthProvider.GetCredential(token, secret);

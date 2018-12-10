@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Firebase;
 using System.Linq;
 using Firebase.Auth;
+using Android.Runtime;
+using Android.Gms.Extensions;
 
 namespace Plugin.FirebaseAuth
 {
@@ -94,6 +96,31 @@ namespace Plugin.FirebaseAuth
             }
         }
 
+        public async Task<IAuthResult> SignInWithEmailLinkAsync(string email, string link)
+        {
+            try
+            {
+                var result = await TasksExtensions.AsAsync<Firebase.Auth.IAuthResult>(_auth.SignInWithEmailLink(email, link)).ConfigureAwait(false);
+                return new AuthResultWrapper(result);
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public async Task SendSignInLinkToEmailAsync(string email, ActionCodeSettings actionCodeSettings)
+        {
+            try
+            {
+                await TasksExtensions.AsAsync(_auth.SendSignInLinkToEmail(email, actionCodeSettings.ToNative())).ConfigureAwait(false);
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
         public async Task<string[]> FetchProvidersForEmailAsync(string email)
         {
             try
@@ -167,29 +194,30 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public Task<string> VerifyPasswordResetCodeAsync(string code)
+        public async Task<string> VerifyPasswordResetCodeAsync(string code)
         {
-            var tcs = new TaskCompletionSource<string>();
-
-            _auth.VerifyPasswordResetCode(code).AddOnCompleteListener(new OnCompleteHandlerListener(task =>
+            try
             {
-                if (task.IsSuccessful)
-                {
-                    var result = task.Result.ToString();
-                    tcs.SetResult(result);
-                }
-                else
-                {
-                    Exception exception = task.Exception;
-                    if (exception is FirebaseException firebaseException)
-                    {
-                        exception = ExceptionMapper.Map(firebaseException);
-                    }
-                    tcs.SetException(exception);
-                }
-            }));
+                var result = await TasksExtensions.AsAsync<Java.Lang.String>(_auth.VerifyPasswordResetCode(code)).ConfigureAwait(false);
+                return result.ToString();
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
 
-            return tcs.Task;
+        public async Task UpdateCurrentUserAsync(IUser user)
+        {
+            try
+            {
+                var wrapper = (UserWrapper)user;
+                await TasksExtensions.AsAsync(_auth.UpdateCurrentUser((FirebaseUser)wrapper)).ConfigureAwait(false);
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
         }
 
         public void SignOut()
@@ -207,6 +235,11 @@ namespace Plugin.FirebaseAuth
         public void UseAppLanguage()
         {
             _auth.UseAppLanguage();
+        }
+
+        public bool IsSignInWithEmailLink(string link)
+        {
+            return _auth.IsSignInWithEmailLink(link);
         }
 
         public IListenerRegistration AddAuthStateChangedListener(AuthStateChangedHandler listener)

@@ -6,6 +6,8 @@ namespace Plugin.FirebaseAuth
     {
         public string ProviderId => GoogleAuthProvider.Id;
 
+        public string GoogleSignInMethod => GoogleAuthProvider.SignInMethod;
+
         public IAuthCredential GetCredential(string idToken, string accessToken)
         {
             var credential = GoogleAuthProvider.GetCredential(idToken, accessToken);

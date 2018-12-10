@@ -93,6 +93,19 @@ namespace Plugin.FirebaseAuth
             }
         }
 
+        public async Task<IAuthResult> SignInWithEmailLinkAsync(string email, string link)
+        {
+            try
+            {
+                var result = await _auth.SignInWithLinkAsync(email, link).ConfigureAwait(false);
+                return new AuthResultWrapper(result);
+            }
+            catch (NSErrorException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
         public async Task<string[]> FetchProvidersForEmailAsync(string email)
         {
             try
@@ -122,6 +135,18 @@ namespace Plugin.FirebaseAuth
             try
             {
                 await _auth.SendPasswordResetAsync(email, actionCodeSettings.ToNative()).ConfigureAwait(false);
+            }
+            catch (NSErrorException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public async Task SendSignInLinkToEmailAsync(string email, ActionCodeSettings actionCodeSettings)
+        {
+            try
+            {
+                await _auth.SendSignInLinkAsync(email, actionCodeSettings.ToNative()).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -177,6 +202,19 @@ namespace Plugin.FirebaseAuth
             }
         }
 
+        public async Task UpdateCurrentUserAsync(IUser user)
+        {
+            try
+            {
+                var wrapper = (UserWrapper)user;
+                await _auth.UpdateCurrentUserAsync((User)user).ConfigureAwait(false);
+            }
+            catch (NSErrorException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
         public void SignOut()
         {
             _auth.SignOut(out var error);
@@ -190,6 +228,11 @@ namespace Plugin.FirebaseAuth
         public void UseAppLanguage()
         {
             _auth.UseAppLanguage();
+        }
+
+        public bool IsSignInWithEmailLink(string link)
+        {
+            return _auth.IsSignIn(link);
         }
 
         public IListenerRegistration AddAuthStateChangedListener(AuthStateChangedHandler listener)
