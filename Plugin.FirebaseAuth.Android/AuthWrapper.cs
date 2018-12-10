@@ -109,11 +109,12 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task SendSignInLinkToEmailAsync(string email, ActionCodeSettings actionCodeSettings)
+        public async Task<string[]> FetchProvidersForEmailAsync(string email)
         {
             try
             {
-                await TasksExtensions.AsAsync(_auth.SendSignInLinkToEmail(email, actionCodeSettings.ToNative())).ConfigureAwait(false);
+                var result = await _auth.FetchProvidersForEmailAsync(email).ConfigureAwait(false);
+                return result.Providers.ToArray();
             }
             catch (FirebaseException e)
             {
@@ -121,11 +122,11 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task<string[]> FetchProvidersForEmailAsync(string email)
+        public async Task<string[]> FetchSignInMethodsForEmailAsync(string email)
         {
             try
             {
-                var result = await _auth.FetchProvidersForEmailAsync(email).ConfigureAwait(false);
+                var result = await TasksExtensions.AsAsync<ISignInMethodQueryResult>(_auth.FetchSignInMethodsForEmail(email)).ConfigureAwait(false);
                 return result.Providers.ToArray();
             }
             catch (FirebaseException e)
@@ -151,6 +152,18 @@ namespace Plugin.FirebaseAuth
             try
             {
                 await _auth.SendPasswordResetEmailAsync(email, actionCodeSettings.ToNative()).ConfigureAwait(false);
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public async Task SendSignInLinkToEmailAsync(string email, ActionCodeSettings actionCodeSettings)
+        {
+            try
+            {
+                await TasksExtensions.AsAsync(_auth.SendSignInLinkToEmail(email, actionCodeSettings.ToNative())).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {

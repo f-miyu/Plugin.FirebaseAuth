@@ -118,6 +118,18 @@ namespace Plugin.FirebaseAuth
             }
         }
 
+        public async Task<string[]> FetchSignInMethodsForEmailAsync(string email)
+        {
+            try
+            {
+                return await _auth.FetchSignInMethodsAsync(email).ConfigureAwait(false);
+            }
+            catch (NSErrorException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
         public async Task SendPasswordResetEmailAsync(string email)
         {
             try

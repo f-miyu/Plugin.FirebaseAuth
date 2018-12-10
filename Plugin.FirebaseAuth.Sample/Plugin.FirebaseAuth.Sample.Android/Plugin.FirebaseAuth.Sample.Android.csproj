@@ -71,7 +71,7 @@
       <Version>27.0.2.1</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Firebase.Auth">
-      <Version>60.1142.1</Version>
+      <Version>70.1602.0-preview2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

@@ -17,6 +17,7 @@ namespace Plugin.FirebaseAuth
         Task<IAuthResult> SignInWithEmailAndPasswordAsync(string email, string password);
         Task<IAuthResult> SignInWithEmailLinkAsync(string email, string link);
         Task<string[]> FetchProvidersForEmailAsync(string email);
+        Task<string[]> FetchSignInMethodsForEmailAsync(string email);
         Task SendPasswordResetEmailAsync(string email);
         Task SendPasswordResetEmailAsync(string email, ActionCodeSettings actionCodeSettings);
         Task SendSignInLinkToEmailAsync(string email, ActionCodeSettings actionCodeSettings);
