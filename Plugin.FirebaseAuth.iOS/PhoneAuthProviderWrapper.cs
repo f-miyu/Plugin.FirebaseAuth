@@ -23,11 +23,36 @@ namespace Plugin.FirebaseAuth
             try
             {
                 var wrapper = (AuthWrapper)auth;
-                var verificationId = await PhoneAuthProvider.From((Auth)wrapper)
+                var firebaseAuth = (Auth)wrapper;
+                firebaseAuth.Settings.AppVerificationDisabledForTesting = false;
+
+                var verificationId = await PhoneAuthProvider.From(firebaseAuth)
                                                             .VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
                                                             .ConfigureAwait(false);
 
                 return new PhoneNumberVerificationResult(null, verificationId);
+            }
+            catch (NSErrorException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public async Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode)
+        {
+            try
+            {
+                var wrapper = (AuthWrapper)auth;
+                var firebaseAuth = (Auth)wrapper;
+                firebaseAuth.Settings.AppVerificationDisabledForTesting = true;
+
+                var verificationId = await PhoneAuthProvider.From(firebaseAuth)
+                                                            .VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
+                                                            .ConfigureAwait(false);
+
+                var credential = GetCredential(auth, verificationId, verificationCode);
+
+                return new PhoneNumberVerificationResult(credential, verificationId);
             }
             catch (NSErrorException e)
             {

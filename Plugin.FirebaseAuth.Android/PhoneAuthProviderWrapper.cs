@@ -14,9 +14,9 @@ namespace Plugin.FirebaseAuth
 
         public string PhoneSignInMethod => PhoneAuthProvider.PhoneSignInMethod;
 
-        public IPhoneAuthCredential GetCredential(IAuth auth, string verificationId, string smsCode)
+        public IPhoneAuthCredential GetCredential(IAuth auth, string verificationId, string verificationCode)
         {
-            var credential = PhoneAuthProvider.GetCredential(verificationId, smsCode);
+            var credential = PhoneAuthProvider.GetCredential(verificationId, verificationCode);
             return new PhoneAuthCredentialWrapper(credential);
         }
 
@@ -28,7 +28,26 @@ namespace Plugin.FirebaseAuth
             var callbacks = new Callbacks(tcs);
 
             var wrapper = (AuthWrapper)auth;
-            PhoneAuthProvider.GetInstance((Firebase.Auth.FirebaseAuth)wrapper).VerifyPhoneNumber(phoneNumber, FirebaseAuth.VerifyingPhoneNumberTimeout, TimeUnit.Seconds, activity, callbacks);
+            var firebaseAuth = (Firebase.Auth.FirebaseAuth)wrapper;
+            firebaseAuth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(null, null);
+
+            PhoneAuthProvider.GetInstance(firebaseAuth).VerifyPhoneNumber(phoneNumber, FirebaseAuth.VerifyingPhoneNumberTimeout, TimeUnit.Seconds, activity, callbacks);
+
+            return tcs.Task;
+        }
+
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode)
+        {
+            var activity = FirebaseAuth.CurrentActivity ?? throw new NullReferenceException("current activity is null");
+
+            var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
+            var callbacks = new Callbacks(tcs);
+
+            var wrapper = (AuthWrapper)auth;
+            var firebaseAuth = (Firebase.Auth.FirebaseAuth)wrapper;
+            firebaseAuth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(phoneNumber, verificationCode);
+
+            PhoneAuthProvider.GetInstance(firebaseAuth).VerifyPhoneNumber(phoneNumber, FirebaseAuth.VerifyingPhoneNumberTimeout, TimeUnit.Seconds, activity, callbacks);
 
             return tcs.Task;
         }
