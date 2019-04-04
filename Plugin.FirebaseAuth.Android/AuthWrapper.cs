@@ -70,12 +70,12 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task<IUser> SignInWithCustomTokenAsync(string token)
+        public async Task<IAuthResult> SignInWithCustomTokenAsync(string token)
         {
             try
             {
                 var result = await _auth.SignInWithCustomTokenAsync(token).ConfigureAwait(false);
-                return new UserWrapper(result.User);
+                return new AuthResultWrapper(result);
             }
             catch (FirebaseException e)
             {

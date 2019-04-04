@@ -18,7 +18,12 @@ namespace Plugin.FirebaseAuth
             return new PhoneAuthCredentialWrapper(credential);
         }
 
-        public async Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber)
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber)
+        {
+            return VerifyPhoneNumberAsync(auth, phoneNumber, default(TimeSpan));
+        }
+
+        public async Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber, TimeSpan timeSpan)
         {
             try
             {
@@ -38,26 +43,31 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode)
-        {
-            try
-            {
-                var wrapper = (AuthWrapper)auth;
-                var firebaseAuth = (Auth)wrapper;
-                firebaseAuth.Settings.AppVerificationDisabledForTesting = true;
+        //public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode)
+        //{
+        //    return VerifyPhoneNumberForTestingAsync(auth, phoneNumber, verificationCode, default(TimeSpan));
+        //}
 
-                var verificationId = await PhoneAuthProvider.From(firebaseAuth)
-                                                            .VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
-                                                            .ConfigureAwait(false);
+        //public async Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode, TimeSpan timeout)
+        //{
+        //    try
+        //    {
+        //        var wrapper = (AuthWrapper)auth;
+        //        var firebaseAuth = (Auth)wrapper;
+        //        firebaseAuth.Settings.AppVerificationDisabledForTesting = true;
 
-                var credential = GetCredential(auth, verificationId, verificationCode);
+        //        var verificationId = await PhoneAuthProvider.From(firebaseAuth)
+        //                                                    .VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
+        //                                                    .ConfigureAwait(false);
 
-                return new PhoneNumberVerificationResult(credential, verificationId);
-            }
-            catch (NSErrorException e)
-            {
-                throw ExceptionMapper.Map(e);
-            }
-        }
+        //        var credential = GetCredential(auth, verificationId, verificationCode);
+
+        //        return new PhoneNumberVerificationResult(credential, verificationId);
+        //    }
+        //    catch (NSErrorException e)
+        //    {
+        //        throw ExceptionMapper.Map(e);
+        //    }
+        //}
     }
 }

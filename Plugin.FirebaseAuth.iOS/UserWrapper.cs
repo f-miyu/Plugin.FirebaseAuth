@@ -39,6 +39,8 @@ namespace Plugin.FirebaseAuth
 
         public bool IsEmailVerified => _user.IsEmailVerified;
 
+        public IUserMetadata Metadata => _user.Metadata != null ? new UserMetadataWrapper(_user.Metadata) : null;
+
         public async Task DeleteAsync()
         {
             try

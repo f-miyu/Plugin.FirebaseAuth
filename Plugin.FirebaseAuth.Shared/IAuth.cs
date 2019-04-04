@@ -12,7 +12,7 @@ namespace Plugin.FirebaseAuth
         string LanguageCode { get; set; }
         Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password);
         Task<IAuthResult> SignInAnonymouslyAsync();
-        Task<IUser> SignInWithCustomTokenAsync(string token);
+        Task<IAuthResult> SignInWithCustomTokenAsync(string token);
         Task<IAuthResult> SignInWithCredentialAsync(IAuthCredential credential);
         Task<IAuthResult> SignInWithEmailAndPasswordAsync(string email, string password);
         Task<IAuthResult> SignInWithEmailLinkAsync(string email, string link);

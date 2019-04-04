@@ -32,5 +32,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)IOAuthProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PhoneNumberVerificationResult.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IAuth.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IUserMetadata.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IPlayGamesAuthProvider.cs" />
   </ItemGroup>
 </Project>

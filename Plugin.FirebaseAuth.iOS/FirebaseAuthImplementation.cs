@@ -19,6 +19,8 @@ namespace Plugin.FirebaseAuth
 
         public IOAuthProvider OAuthProvider { get; } = new OAuthProviderWrapper();
 
+        public IPlayGamesAuthProvider PlayGamesAuthProvider { get; }
+
         public IAuth Instance => new AuthWrapper(Auth.DefaultInstance);
 
         public IAuth GetInstance(string appName)

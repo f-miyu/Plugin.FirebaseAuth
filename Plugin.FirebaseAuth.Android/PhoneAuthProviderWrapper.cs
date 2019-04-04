@@ -5,6 +5,7 @@ using Firebase.Auth;
 using Java.Util.Concurrent;
 using Android.App;
 using System.Diagnostics;
+using Plugin.CurrentActivity;
 
 namespace Plugin.FirebaseAuth
 {
@@ -22,35 +23,45 @@ namespace Plugin.FirebaseAuth
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber)
         {
-            var activity = FirebaseAuth.CurrentActivity ?? throw new NullReferenceException("current activity is null");
-
-            var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
-            var callbacks = new Callbacks(tcs);
-
-            var wrapper = (AuthWrapper)auth;
-            var firebaseAuth = (Firebase.Auth.FirebaseAuth)wrapper;
-            firebaseAuth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(null, null);
-
-            PhoneAuthProvider.GetInstance(firebaseAuth).VerifyPhoneNumber(phoneNumber, FirebaseAuth.VerifyingPhoneNumberTimeout, TimeUnit.Seconds, activity, callbacks);
-
-            return tcs.Task;
+            return VerifyPhoneNumberAsync(auth, phoneNumber, TimeSpan.FromSeconds(60));
         }
 
-        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode)
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber, TimeSpan timeout)
         {
-            var activity = FirebaseAuth.CurrentActivity ?? throw new NullReferenceException("current activity is null");
+            var activity = CrossCurrentActivity.Current.Activity ?? throw new NullReferenceException("current activity is null");
 
             var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
             var callbacks = new Callbacks(tcs);
 
             var wrapper = (AuthWrapper)auth;
             var firebaseAuth = (Firebase.Auth.FirebaseAuth)wrapper;
-            firebaseAuth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(phoneNumber, verificationCode);
+            //firebaseAuth.FirebaseAuthSettings.SetAutoRetrievedSmsCotimeoutdeForPhoneNumber(null, null);
 
-            PhoneAuthProvider.GetInstance(firebaseAuth).VerifyPhoneNumber(phoneNumber, FirebaseAuth.VerifyingPhoneNumberTimeout, TimeUnit.Seconds, activity, callbacks);
+            PhoneAuthProvider.GetInstance(firebaseAuth).VerifyPhoneNumber(phoneNumber, (long)timeout.TotalMilliseconds, TimeUnit.Milliseconds, activity, callbacks);
 
             return tcs.Task;
         }
+
+        //public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode)
+        //{
+        //    return VerifyPhoneNumberForTestingAsync(auth, phoneNumber, verificationCode, TimeSpan.FromSeconds(60));
+        //}
+
+        //public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode, TimeSpan timeout)
+        //{
+        //    var activity = CrossCurrentActivity.Current.Activity ?? throw new NullReferenceException("current activity is null");
+
+        //    var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
+        //    var callbacks = new Callbacks(tcs);
+
+        //    var wrapper = (AuthWrapper)auth;
+        //    var firebaseAuth = (Firebase.Auth.FirebaseAuth)wrapper;
+        //    //firebaseAuth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(phoneNumber, verificationCode);
+
+        //    PhoneAuthProvider.GetInstance(firebaseAuth).VerifyPhoneNumber(phoneNumber, (long)timeout.TotalMilliseconds, TimeUnit.Milliseconds, activity, callbacks);
+
+        //    return tcs.Task;
+        //}
 
         private class Callbacks : PhoneAuthProvider.OnVerificationStateChangedCallbacks
         {

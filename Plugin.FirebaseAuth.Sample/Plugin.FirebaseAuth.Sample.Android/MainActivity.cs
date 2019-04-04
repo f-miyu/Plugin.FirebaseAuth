@@ -8,6 +8,7 @@ using Android.Content;
 using System;
 using Plugin.FirebaseAuth.Sample.Auth;
 using Xamarin.Auth;
+using Plugin.CurrentActivity;
 
 namespace Plugin.FirebaseAuth.Sample.Droid
 {
@@ -23,7 +24,7 @@ namespace Plugin.FirebaseAuth.Sample.Droid
 
             base.OnCreate(bundle);
 
-            FirebaseAuth.Init(this);
+            CrossCurrentActivity.Current.Init(this, bundle);
 
             Xamarin.Auth.Presenters.XamarinAndroid.AuthenticationConfiguration.Init(this, bundle);
             CustomTabsConfiguration.CustomTabsClosingMessage = null;

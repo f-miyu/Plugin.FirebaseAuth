@@ -11,6 +11,7 @@ namespace Plugin.FirebaseAuth
         IGitHubAuthProvider GitHubAuthProvider { get; }
         IPhoneAuthProvider PhoneAuthProvider { get; }
         IOAuthProvider OAuthProvider { get; }
+        IPlayGamesAuthProvider PlayGamesAuthProvider { get; }
         IAuth Instance { get; }
         IAuth GetInstance(string appName);
     }

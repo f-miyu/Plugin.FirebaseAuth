@@ -15,6 +15,7 @@ namespace Plugin.FirebaseAuth
         string ProviderId { get; }
         string Uid { get; }
         bool IsEmailVerified { get; }
+        IUserMetadata Metadata { get; }
         Task DeleteAsync();
         Task<string> GetIdTokenAsync(bool forceRefresh);
         Task<IAuthResult> LinkWithCredentialAsync(IAuthCredential credential);
