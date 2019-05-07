@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Firebase;
 using System.Linq;
 using Firebase.Auth;
-using Android.Runtime;
 using Android.Gms.Extensions;
 
 namespace Plugin.FirebaseAuth
@@ -100,7 +99,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var result = await TasksExtensions.AsAsync<Firebase.Auth.IAuthResult>(_auth.SignInWithEmailLink(email, link)).ConfigureAwait(false);
+                var result = await _auth.SignInWithEmailLink(email, link).AsAsync<Firebase.Auth.IAuthResult>().ConfigureAwait(false);
                 return new AuthResultWrapper(result);
             }
             catch (FirebaseException e)
@@ -126,7 +125,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var result = await TasksExtensions.AsAsync<ISignInMethodQueryResult>(_auth.FetchSignInMethodsForEmail(email)).ConfigureAwait(false);
+                var result = await _auth.FetchSignInMethodsForEmail(email).AsAsync<ISignInMethodQueryResult>().ConfigureAwait(false);
                 return result.SignInMethods.ToArray();
             }
             catch (FirebaseException e)
@@ -163,7 +162,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await TasksExtensions.AsAsync(_auth.SendSignInLinkToEmail(email, actionCodeSettings.ToNative())).ConfigureAwait(false);
+                await _auth.SendSignInLinkToEmail(email, actionCodeSettings.ToNative()).AsAsync().ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -211,7 +210,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var result = await TasksExtensions.AsAsync<Java.Lang.String>(_auth.VerifyPasswordResetCode(code)).ConfigureAwait(false);
+                var result = await _auth.VerifyPasswordResetCode(code).AsAsync<Java.Lang.String>().ConfigureAwait(false);
                 return result.ToString();
             }
             catch (FirebaseException e)
@@ -225,7 +224,7 @@ namespace Plugin.FirebaseAuth
             try
             {
                 var wrapper = (UserWrapper)user;
-                await TasksExtensions.AsAsync(_auth.UpdateCurrentUser((FirebaseUser)wrapper)).ConfigureAwait(false);
+                await _auth.UpdateCurrentUser((FirebaseUser)wrapper).AsAsync().ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {

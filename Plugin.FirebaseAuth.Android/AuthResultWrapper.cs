@@ -5,31 +5,9 @@ namespace Plugin.FirebaseAuth
     {
         private readonly Firebase.Auth.IAuthResult _authResult;
 
-        private IAdditionalUserInfo _additionalUserInfo;
-        public IAdditionalUserInfo AdditionalUserInfo
-        {
-            get
-            {
-                if (_authResult.AdditionalUserInfo != null && _additionalUserInfo == null)
-                {
-                    _additionalUserInfo = new AdditionalUserInfoWrapper(_authResult.AdditionalUserInfo);
-                }
-                return _additionalUserInfo;
-            }
-        }
+        public IAdditionalUserInfo AdditionalUserInfo => _authResult.AdditionalUserInfo != null ? new AdditionalUserInfoWrapper(_authResult.AdditionalUserInfo) : null;
 
-        private IUser _user;
-        public IUser User
-        {
-            get
-            {
-                if (_authResult.User != null && _user == null)
-                {
-                    _user = new UserWrapper(_authResult.User);
-                }
-                return _user;
-            }
-        }
+        public IUser User => _authResult.User != null ? new UserWrapper(_authResult.User) : null;
 
         public AuthResultWrapper(Firebase.Auth.IAuthResult authResult)
         {

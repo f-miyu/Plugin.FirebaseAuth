@@ -3,7 +3,7 @@ using Firebase;
 using Firebase.Auth;
 namespace Plugin.FirebaseAuth
 {
-    public static class ExceptionMapper
+    internal static class ExceptionMapper
     {
         public static Exception Map(FirebaseException exception)
         {

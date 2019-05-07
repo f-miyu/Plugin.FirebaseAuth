@@ -10,20 +10,18 @@ namespace Plugin.FirebaseAuth
     {
         private readonly AdditionalUserInfo _additionalUserInfo;
 
-        private IDictionary<string, object> _profile;
         public IDictionary<string, object> Profile
         {
             get
             {
-                if (_additionalUserInfo.Profile != null && _profile == null)
+                if (_additionalUserInfo.Profile == null) return null;
+
+                var profile = new Dictionary<string, object>();
+                foreach (var (key, value) in _additionalUserInfo.Profile)
                 {
-                    _profile = new Dictionary<string, Object>();
-                    foreach (var (key, value) in _additionalUserInfo.Profile)
-                    {
-                        _profile[key.ToString()] = ConvertProfileValue(value);
-                    }
+                    profile[key.ToString()] = ConvertProfileValue(value);
                 }
-                return _profile;
+                return profile;
             }
         }
 

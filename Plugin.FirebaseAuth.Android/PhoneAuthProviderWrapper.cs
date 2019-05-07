@@ -35,33 +35,33 @@ namespace Plugin.FirebaseAuth
 
             var wrapper = (AuthWrapper)auth;
             var firebaseAuth = (Firebase.Auth.FirebaseAuth)wrapper;
-            //firebaseAuth.FirebaseAuthSettings.SetAutoRetrievedSmsCotimeoutdeForPhoneNumber(null, null);
+            firebaseAuth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(null, null);
 
             PhoneAuthProvider.GetInstance(firebaseAuth).VerifyPhoneNumber(phoneNumber, (long)timeout.TotalMilliseconds, TimeUnit.Milliseconds, activity, callbacks);
 
             return tcs.Task;
         }
 
-        //public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode)
-        //{
-        //    return VerifyPhoneNumberForTestingAsync(auth, phoneNumber, verificationCode, TimeSpan.FromSeconds(60));
-        //}
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode)
+        {
+            return VerifyPhoneNumberForTestingAsync(auth, phoneNumber, verificationCode, TimeSpan.FromSeconds(60));
+        }
 
-        //public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode, TimeSpan timeout)
-        //{
-        //    var activity = CrossCurrentActivity.Current.Activity ?? throw new NullReferenceException("current activity is null");
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode, TimeSpan timeout)
+        {
+            var activity = CrossCurrentActivity.Current.Activity ?? throw new NullReferenceException("current activity is null");
 
-        //    var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
-        //    var callbacks = new Callbacks(tcs);
+            var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
+            var callbacks = new Callbacks(tcs);
 
-        //    var wrapper = (AuthWrapper)auth;
-        //    var firebaseAuth = (Firebase.Auth.FirebaseAuth)wrapper;
-        //    //firebaseAuth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(phoneNumber, verificationCode);
+            var wrapper = (AuthWrapper)auth;
+            var firebaseAuth = (Firebase.Auth.FirebaseAuth)wrapper;
+            firebaseAuth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(phoneNumber, verificationCode);
 
-        //    PhoneAuthProvider.GetInstance(firebaseAuth).VerifyPhoneNumber(phoneNumber, (long)timeout.TotalMilliseconds, TimeUnit.Milliseconds, activity, callbacks);
+            PhoneAuthProvider.GetInstance(firebaseAuth).VerifyPhoneNumber(phoneNumber, (long)timeout.TotalMilliseconds, TimeUnit.Milliseconds, activity, callbacks);
 
-        //    return tcs.Task;
-        //}
+            return tcs.Task;
+        }
 
         private class Callbacks : PhoneAuthProvider.OnVerificationStateChangedCallbacks
         {

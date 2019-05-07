@@ -43,31 +43,31 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        //public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode)
-        //{
-        //    return VerifyPhoneNumberForTestingAsync(auth, phoneNumber, verificationCode, default(TimeSpan));
-        //}
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode)
+        {
+            return VerifyPhoneNumberForTestingAsync(auth, phoneNumber, verificationCode, default(TimeSpan));
+        }
 
-        //public async Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode, TimeSpan timeout)
-        //{
-        //    try
-        //    {
-        //        var wrapper = (AuthWrapper)auth;
-        //        var firebaseAuth = (Auth)wrapper;
-        //        firebaseAuth.Settings.AppVerificationDisabledForTesting = true;
+        public async Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode, TimeSpan timeout)
+        {
+            try
+            {
+                var wrapper = (AuthWrapper)auth;
+                var firebaseAuth = (Auth)wrapper;
+                firebaseAuth.Settings.AppVerificationDisabledForTesting = true;
 
-        //        var verificationId = await PhoneAuthProvider.From(firebaseAuth)
-        //                                                    .VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
-        //                                                    .ConfigureAwait(false);
+                var verificationId = await PhoneAuthProvider.From(firebaseAuth)
+                                                            .VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
+                                                            .ConfigureAwait(false);
 
-        //        var credential = GetCredential(auth, verificationId, verificationCode);
+                var credential = GetCredential(auth, verificationId, verificationCode);
 
-        //        return new PhoneNumberVerificationResult(credential, verificationId);
-        //    }
-        //    catch (NSErrorException e)
-        //    {
-        //        throw ExceptionMapper.Map(e);
-        //    }
-        //}
+                return new PhoneNumberVerificationResult(credential, verificationId);
+            }
+            catch (NSErrorException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
     }
 }

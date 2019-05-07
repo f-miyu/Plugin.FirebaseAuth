@@ -10,18 +10,7 @@ namespace Plugin.FirebaseAuth
     {
         private readonly Firebase.Auth.IAdditionalUserInfo _additionalUserInfo;
 
-        private IDictionary<string, object> _profile;
-        public IDictionary<string, object> Profile
-        {
-            get
-            {
-                if (_additionalUserInfo.Profile != null && _profile == null)
-                {
-                    _profile = _additionalUserInfo.Profile.ToDictionary(pair => pair.Key, pair => ConvertProfileValue(pair.Value));
-                }
-                return _profile;
-            }
-        }
+        public IDictionary<string, object> Profile => _additionalUserInfo.Profile?.ToDictionary(pair => pair.Key, pair => ConvertProfileValue(pair.Value));
 
         public string ProviderId => _additionalUserInfo.ProviderId;
 

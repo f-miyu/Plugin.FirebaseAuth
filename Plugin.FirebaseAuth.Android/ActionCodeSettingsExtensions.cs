@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Plugin.FirebaseAuth
 {
-    public static class ActionCodeSettingsExtensions
+    internal static class ActionCodeSettingsExtensions
     {
         public static Firebase.Auth.ActionCodeSettings ToNative(this ActionCodeSettings self)
         {
