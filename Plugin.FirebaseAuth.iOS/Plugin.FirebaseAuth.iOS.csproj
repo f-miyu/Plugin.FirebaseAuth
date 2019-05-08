@@ -72,6 +72,7 @@
     <Compile Include="ActionCodeSettingsExtensions.cs" />
     <Compile Include="AuthWrapper.cs" />
     <Compile Include="UserMetadataWrapper.cs" />
+    <Compile Include="AuthProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -71,25 +71,25 @@
       <HintPath>..\packages\Xamarin.Android.Support.v4.28.0.0.1\lib\monoandroid90\Xamarin.Android.Support.v4.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.GooglePlayServices.Basement">
-      <HintPath>..\packages\Xamarin.GooglePlayServices.Basement.71.1610.0-preview3\lib\monoandroid90\Xamarin.GooglePlayServices.Basement.dll</HintPath>
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Basement.71.1610.0-preview4\lib\monoandroid90\Xamarin.GooglePlayServices.Basement.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.GooglePlayServices.Tasks">
-      <HintPath>..\packages\Xamarin.GooglePlayServices.Tasks.71.1601.0-preview3\lib\monoandroid90\Xamarin.GooglePlayServices.Tasks.dll</HintPath>
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Tasks.71.1601.0-preview4\lib\monoandroid90\Xamarin.GooglePlayServices.Tasks.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Firebase.Common">
-      <HintPath>..\packages\Xamarin.Firebase.Common.71.1603.0-preview3\lib\monoandroid90\Xamarin.Firebase.Common.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Firebase.Common.71.1603.0-preview4\lib\monoandroid90\Xamarin.Firebase.Common.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.GooglePlayServices.Base">
-      <HintPath>..\packages\Xamarin.GooglePlayServices.Base.71.1601.0-preview3\lib\monoandroid90\Xamarin.GooglePlayServices.Base.dll</HintPath>
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Base.71.1601.0-preview4\lib\monoandroid90\Xamarin.GooglePlayServices.Base.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Firebase.Auth.Interop">
-      <HintPath>..\packages\Xamarin.Firebase.Auth.Interop.71.1601.0-preview3\lib\monoandroid90\Xamarin.Firebase.Auth.Interop.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Firebase.Auth.Interop.71.1601.0-preview4\lib\monoandroid90\Xamarin.Firebase.Auth.Interop.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.GooglePlayServices.Flags">
-      <HintPath>..\packages\Xamarin.GooglePlayServices.Flags.71.1601.0-preview3\lib\monoandroid90\Xamarin.GooglePlayServices.Flags.dll</HintPath>
+      <HintPath>..\packages\Xamarin.GooglePlayServices.Flags.71.1601.0-preview4\lib\monoandroid90\Xamarin.GooglePlayServices.Flags.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Firebase.Auth">
-      <HintPath>..\packages\Xamarin.Firebase.Auth.71.1605.0-preview3\lib\monoandroid90\Xamarin.Firebase.Auth.dll</HintPath>
+      <HintPath>..\packages\Xamarin.Firebase.Auth.71.1605.0-preview4\lib\monoandroid90\Xamarin.Firebase.Auth.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Arch.Core.Runtime">
       <HintPath>..\packages\Xamarin.Android.Arch.Core.Runtime.1.1.1.1\lib\monoandroid90\Xamarin.Android.Arch.Core.Runtime.dll</HintPath>
@@ -174,6 +174,7 @@
     <Compile Include="AuthWrapper.cs" />
     <Compile Include="UserMetadataWrapper.cs" />
     <Compile Include="PlayGamesAuthProviderWrapper.cs" />
+    <Compile Include="AuthProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -211,11 +212,11 @@
   <Import Project="..\packages\Xamarin.Android.Support.Core.UI.28.0.0.1\build\monoandroid90\Xamarin.Android.Support.Core.UI.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Core.UI.28.0.0.1\build\monoandroid90\Xamarin.Android.Support.Core.UI.targets')" />
   <Import Project="..\packages\Xamarin.Android.Support.Fragment.28.0.0.1\build\monoandroid90\Xamarin.Android.Support.Fragment.targets" Condition="Exists('..\packages\Xamarin.Android.Support.Fragment.28.0.0.1\build\monoandroid90\Xamarin.Android.Support.Fragment.targets')" />
   <Import Project="..\packages\Xamarin.Android.Support.v4.28.0.0.1\build\monoandroid90\Xamarin.Android.Support.v4.targets" Condition="Exists('..\packages\Xamarin.Android.Support.v4.28.0.0.1\build\monoandroid90\Xamarin.Android.Support.v4.targets')" />
-  <Import Project="..\packages\Xamarin.GooglePlayServices.Basement.71.1610.0-preview3\build\MonoAndroid90\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Basement.71.1610.0-preview3\build\MonoAndroid90\Xamarin.GooglePlayServices.Basement.targets')" />
-  <Import Project="..\packages\Xamarin.GooglePlayServices.Tasks.71.1601.0-preview3\build\MonoAndroid90\Xamarin.GooglePlayServices.Tasks.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Tasks.71.1601.0-preview3\build\MonoAndroid90\Xamarin.GooglePlayServices.Tasks.targets')" />
-  <Import Project="..\packages\Xamarin.Firebase.Common.71.1603.0-preview3\build\MonoAndroid90\Xamarin.Firebase.Common.targets" Condition="Exists('..\packages\Xamarin.Firebase.Common.71.1603.0-preview3\build\MonoAndroid90\Xamarin.Firebase.Common.targets')" />
-  <Import Project="..\packages\Xamarin.GooglePlayServices.Base.71.1601.0-preview3\build\MonoAndroid90\Xamarin.GooglePlayServices.Base.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Base.71.1601.0-preview3\build\MonoAndroid90\Xamarin.GooglePlayServices.Base.targets')" />
-  <Import Project="..\packages\Xamarin.Firebase.Auth.Interop.71.1601.0-preview3\build\MonoAndroid90\Xamarin.Firebase.Auth.Interop.targets" Condition="Exists('..\packages\Xamarin.Firebase.Auth.Interop.71.1601.0-preview3\build\MonoAndroid90\Xamarin.Firebase.Auth.Interop.targets')" />
-  <Import Project="..\packages\Xamarin.GooglePlayServices.Flags.71.1601.0-preview3\build\MonoAndroid90\Xamarin.GooglePlayServices.Flags.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Flags.71.1601.0-preview3\build\MonoAndroid90\Xamarin.GooglePlayServices.Flags.targets')" />
-  <Import Project="..\packages\Xamarin.Firebase.Auth.71.1605.0-preview3\build\MonoAndroid90\Xamarin.Firebase.Auth.targets" Condition="Exists('..\packages\Xamarin.Firebase.Auth.71.1605.0-preview3\build\MonoAndroid90\Xamarin.Firebase.Auth.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Basement.71.1610.0-preview4\build\MonoAndroid90\Xamarin.GooglePlayServices.Basement.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Basement.71.1610.0-preview4\build\MonoAndroid90\Xamarin.GooglePlayServices.Basement.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Tasks.71.1601.0-preview4\build\MonoAndroid90\Xamarin.GooglePlayServices.Tasks.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Tasks.71.1601.0-preview4\build\MonoAndroid90\Xamarin.GooglePlayServices.Tasks.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Common.71.1603.0-preview4\build\MonoAndroid90\Xamarin.Firebase.Common.targets" Condition="Exists('..\packages\Xamarin.Firebase.Common.71.1603.0-preview4\build\MonoAndroid90\Xamarin.Firebase.Common.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Base.71.1601.0-preview4\build\MonoAndroid90\Xamarin.GooglePlayServices.Base.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Base.71.1601.0-preview4\build\MonoAndroid90\Xamarin.GooglePlayServices.Base.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Auth.Interop.71.1601.0-preview4\build\MonoAndroid90\Xamarin.Firebase.Auth.Interop.targets" Condition="Exists('..\packages\Xamarin.Firebase.Auth.Interop.71.1601.0-preview4\build\MonoAndroid90\Xamarin.Firebase.Auth.Interop.targets')" />
+  <Import Project="..\packages\Xamarin.GooglePlayServices.Flags.71.1601.0-preview4\build\MonoAndroid90\Xamarin.GooglePlayServices.Flags.targets" Condition="Exists('..\packages\Xamarin.GooglePlayServices.Flags.71.1601.0-preview4\build\MonoAndroid90\Xamarin.GooglePlayServices.Flags.targets')" />
+  <Import Project="..\packages\Xamarin.Firebase.Auth.71.1605.0-preview4\build\MonoAndroid90\Xamarin.Firebase.Auth.targets" Condition="Exists('..\packages\Xamarin.Firebase.Auth.71.1605.0-preview4\build\MonoAndroid90\Xamarin.Firebase.Auth.targets')" />
 </Project>

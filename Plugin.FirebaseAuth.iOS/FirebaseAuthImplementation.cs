@@ -21,12 +21,11 @@ namespace Plugin.FirebaseAuth
 
         public IPlayGamesAuthProvider PlayGamesAuthProvider { get; }
 
-        public IAuth Instance => new AuthWrapper(Auth.DefaultInstance);
+        public IAuth Instance => AuthProvider.Auth;
 
         public IAuth GetInstance(string appName)
         {
-            var app = Firebase.Core.App.From(appName);
-            return new AuthWrapper(Auth.From(app));
+            return AuthProvider.GetAuth(appName);
         }
     }
 }

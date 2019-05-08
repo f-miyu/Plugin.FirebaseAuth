@@ -296,12 +296,7 @@ namespace Plugin.FirebaseAuth
 
                 public void OnAuthStateChanged(Firebase.Auth.FirebaseAuth auth)
                 {
-                    IUser user = null;
-                    if (auth.CurrentUser != null)
-                    {
-                        user = new UserWrapper(auth.CurrentUser);
-                    }
-                    _handler?.Invoke(user);
+                    _handler?.Invoke(auth == null ? null : AuthProvider.GetAuth(auth));
                 }
             }
         }
@@ -338,12 +333,7 @@ namespace Plugin.FirebaseAuth
 
                 public void OnIdTokenChanged(Firebase.Auth.FirebaseAuth auth)
                 {
-                    IUser user = null;
-                    if (auth.CurrentUser != null)
-                    {
-                        user = new UserWrapper(auth.CurrentUser);
-                    }
-                    _handler?.Invoke(user);
+                    _handler?.Invoke(auth == null ? null : AuthProvider.GetAuth(auth));
                 }
             }
         }

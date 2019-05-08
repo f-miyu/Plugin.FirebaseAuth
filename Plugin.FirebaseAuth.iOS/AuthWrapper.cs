@@ -267,12 +267,7 @@ namespace Plugin.FirebaseAuth
                 _instance = instance;
                 _listner = _instance.AddAuthStateDidChangeListener((Auth auth, User user) =>
                 {
-                    IUser userWrapper = null;
-                    if (user != null)
-                    {
-                        userWrapper = new UserWrapper(user);
-                    }
-                    handler?.Invoke(userWrapper);
+                    handler?.Invoke(auth == null ? null : AuthProvider.GetAuth(auth));
                 });
             }
 
@@ -296,12 +291,7 @@ namespace Plugin.FirebaseAuth
                 _instance = instance;
                 _listner = _instance.AddIdTokenDidChangeListener((Auth auth, User user) =>
                 {
-                    IUser userWrapper = null;
-                    if (user != null)
-                    {
-                        userWrapper = new UserWrapper(user);
-                    }
-                    handler?.Invoke(userWrapper);
+                    handler?.Invoke(auth == null ? null : AuthProvider.GetAuth(auth));
                 });
             }
 

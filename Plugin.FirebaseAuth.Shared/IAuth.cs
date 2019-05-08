@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace Plugin.FirebaseAuth
 {
-    public delegate void AuthStateChangedHandler(IUser user);
-    public delegate void IdTokenChangedHandler(IUser user);
+    public delegate void AuthStateChangedHandler(IAuth auth);
+    public delegate void IdTokenChangedHandler(IAuth auth);
 
     public interface IAuth
     {
