@@ -34,5 +34,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)IAuth.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IUserMetadata.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IPlayGamesAuthProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IdTokenEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AuthStateEventArgs.cs" />
   </ItemGroup>
 </Project>

@@ -7,6 +7,10 @@ namespace Plugin.FirebaseAuth
 {
     public class AuthWrapper : IAuth
     {
+        public event EventHandler<AuthStateEventArgs> AuthState;
+
+        public event EventHandler<IdTokenEventArgs> IdToken;
+
         public IUser CurrentUser => _auth.CurrentUser != null ? new UserWrapper(_auth.CurrentUser) : null;
 
         public string LanguageCode
@@ -25,6 +29,9 @@ namespace Plugin.FirebaseAuth
         public AuthWrapper(Auth auth)
         {
             _auth = auth;
+
+            _auth.AddAuthStateDidChangeListener(OnAuthStateChanged);
+            _auth.AddIdTokenDidChangeListener(OnIdTokenChanged);
         }
 
         public async Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password)
@@ -249,59 +256,71 @@ namespace Plugin.FirebaseAuth
 
         public IListenerRegistration AddAuthStateChangedListener(AuthStateChangedHandler listener)
         {
-            return new AuthStateChangedListenerRegistration(_auth, listener);
+            return new AuthStateChangedListenerRegistration(this, listener);
         }
 
         public IListenerRegistration AddIdTokenChangedListener(IdTokenChangedHandler listener)
         {
-            return new IdTokenChangedListenerRegistration(_auth, listener);
+            return new IdTokenChangedListenerRegistration(this, listener);
+        }
+
+        private void OnAuthStateChanged(Auth auth, User user)
+        {
+            AuthState?.Invoke(this, new AuthStateEventArgs(auth == null ? null : AuthProvider.GetAuth(auth)));
+        }
+
+        private void OnIdTokenChanged(Auth auth, User user)
+        {
+            IdToken?.Invoke(this, new IdTokenEventArgs(auth == null ? null : AuthProvider.GetAuth(auth)));
         }
 
         private class AuthStateChangedListenerRegistration : IListenerRegistration
         {
-            private readonly Auth _instance;
-            private NSObject _listner;
+            private readonly AuthWrapper _auth;
+            private AuthStateChangedHandler _handler;
 
-            public AuthStateChangedListenerRegistration(Auth instance, AuthStateChangedHandler handler)
+            public AuthStateChangedListenerRegistration(AuthWrapper auth, AuthStateChangedHandler handler)
             {
-                _instance = instance;
-                _listner = _instance.AddAuthStateDidChangeListener((Auth auth, User user) =>
-                {
-                    handler?.Invoke(auth == null ? null : AuthProvider.GetAuth(auth));
-                });
+                _auth = auth;
+                _handler = handler;
+
+                _auth.AuthState += OnAuthStateChanged;
             }
 
             public void Remove()
             {
-                if (_listner != null)
-                {
-                    _instance.RemoveAuthStateDidChangeListener(_listner);
-                    _listner = null;
-                }
+                _handler = null;
+                _auth.AuthState -= OnAuthStateChanged;
+            }
+
+            private void OnAuthStateChanged(object sender, AuthStateEventArgs e)
+            {
+                _handler?.Invoke(e.Auth);
             }
         }
 
         private class IdTokenChangedListenerRegistration : IListenerRegistration
         {
-            private readonly Auth _instance;
-            private NSObject _listner;
+            private readonly AuthWrapper _auth;
+            private IdTokenChangedHandler _handler;
 
-            public IdTokenChangedListenerRegistration(Auth instance, IdTokenChangedHandler handler)
+            public IdTokenChangedListenerRegistration(AuthWrapper auth, IdTokenChangedHandler handler)
             {
-                _instance = instance;
-                _listner = _instance.AddIdTokenDidChangeListener((Auth auth, User user) =>
-                {
-                    handler?.Invoke(auth == null ? null : AuthProvider.GetAuth(auth));
-                });
+                _auth = auth;
+                _handler = handler;
+
+                _auth.IdToken += OnIdTokenChanged;
             }
 
             public void Remove()
             {
-                if (_listner != null)
-                {
-                    _instance.RemoveIdTokenDidChangeListener(_listner);
-                    _listner = null;
-                }
+                _handler = null;
+                _auth.IdToken -= OnIdTokenChanged;
+            }
+
+            private void OnIdTokenChanged(object sender, IdTokenEventArgs e)
+            {
+                _handler?.Invoke(e.Auth);
             }
         }
     }

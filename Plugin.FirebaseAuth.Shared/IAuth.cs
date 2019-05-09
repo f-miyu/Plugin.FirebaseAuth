@@ -8,6 +8,8 @@ namespace Plugin.FirebaseAuth
 
     public interface IAuth
     {
+        event EventHandler<AuthStateEventArgs> AuthState;
+        event EventHandler<IdTokenEventArgs> IdToken;
         IUser CurrentUser { get; }
         string LanguageCode { get; set; }
         Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password);

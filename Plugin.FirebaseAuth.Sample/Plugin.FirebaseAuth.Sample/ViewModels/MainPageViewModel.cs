@@ -41,9 +41,9 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
             Title = "Main Page";
 
-            _registration = CrossFirebaseAuth.Current.Instance.AddAuthStateChangedListener((user) =>
+            _registration = CrossFirebaseAuth.Current.Instance.AddAuthStateChangedListener((auth) =>
             {
-                _isSignedIn.Value = user != null;
+                _isSignedIn.Value = auth.CurrentUser != null;
             });
 
             ShowUserCommand = _isSignedIn.ToAsyncReactiveCommand();
