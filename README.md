@@ -20,7 +20,7 @@ Firebase.Core.App.Configure();
 * Add google-services.json to Android project. Select GoogleServicesJson as build action. (If you can't select GoogleServicesJson, reload this android project.)
 * This Plugin uses [Plugin.CurrentActivity](https://github.com/jamesmontemagno/CurrentActivityPlugin). Setup as follows in MainActivity.
 ```C#
-Plugin.FirebaseAuth.FirebaseAuth.Init(this);
+Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
 ```
 * Target Framework must be Android 9.0 (Pie) and Multi-Dex needs to be enabled for the android project.
 ```xml
