@@ -7,7 +7,7 @@ and [Xamarin.Firebase.Auth](https://www.nuget.org/packages/Xamarin.Firebase.Auth
 ## Setup
 Install Nuget package to each projects.
 
-[Plugin.FirebaseAuth](https://www.nuget.org/packages/Plugin.FirebaseAuth/) [![NuGet](https://img.shields.io/nuget/v/Plugin.FirebaseAuth.svg?label=NuGet)](https://www.nuget.org/packages/Plugin.FirebaseAuth/)
+[Plugin.FirebaseAuth](https://www.nuget.org/packages/Plugin.FirebaseAuth/) [![NuGet](https://img.shields.io/nuget/vpre/Plugin.FirebaseAuth.svg?label=NuGet)](https://www.nuget.org/packages/Plugin.FirebaseAuth/)
 
 ### iOS
 * Add GoogleService-Info.plist to iOS project. Select BundleResource as build action.
@@ -15,12 +15,22 @@ Install Nuget package to each projects.
 ```C#
 Firebase.Core.App.Configure();
 ```
+* Target Framework must be Android 9.0 (Pie) and Multi-Dex needs to be enabled for the android project.
+```xml
+<TargetFrameworkVersion>v9.0</TargetFrameworkVersion>
+<AndroidEnableMultiDex>true</AndroidEnableMultiDex>
+```
 
 ### Android
 * Add google-services.json to Android project. Select GoogleServicesJson as build action. (If you can't select GoogleServicesJson, reload this android project.)
-* Initialize as follows in MainActivity.
+* This Plugin uses [Plugin.CurrentActivity](https://github.com/jamesmontemagno/CurrentActivityPlugin). Setup as follows in MainActivity.
 ```C#
 Plugin.FirebaseAuth.FirebaseAuth.Init(this);
+```
+* Target Framework must be Android 9.0 (Pie) and Multi-Dex needs to be enabled for the android project.
+```xml
+<TargetFrameworkVersion>v9.0</TargetFrameworkVersion>
+<AndroidEnableMultiDex>true</AndroidEnableMultiDex>
 ```
 
 ## Usage
@@ -76,13 +86,27 @@ var user = await CrossFirebaseAuth.Current.Instance.SignInWithCustomTokenAsync(t
 var result = await CrossFirebaseAuth.Current.Instance.SignInAnonymouslyAsync()
 ```
 
-### Get the currently signed-in user
+### Events
+#### AuthState
+AuthState event invokes when there is a change in the authentication state.
 ```C#
-var registration = CrossFirebaseAuth.Current.Instance.AddAuthStateChangedListener(user =>
+CrossFirebaseAuth.Current.Instance.AuthState += (sender, e) =>
 {
     ...
-});
+};
+```
 
+#### IdToken
+IdToken event invokes when the id token is changed.
+```C#
+CrossFirebaseAuth.Current.Instance.IdToken += (sender, e) =>
+{
+    ...
+};
+```
+
+### Get the currently signed-in user
+```C#
 var user = CrossFirebaseAuth.Current.Instance.CurrentUser;
 ```
 
