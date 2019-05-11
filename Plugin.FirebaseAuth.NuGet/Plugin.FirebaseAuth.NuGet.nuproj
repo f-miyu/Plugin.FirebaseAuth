@@ -7,7 +7,7 @@
     <ProjectGuid>{52E38BFA-D096-4F6A-A249-9E4BCFFADC55}</ProjectGuid>
     <Description>Cross platform plugin for Firebase Authentication</Description>
     <PackageId>Plugin.FirebaseAuth</PackageId>
-    <PackageVersion>2.0.0-pre2</PackageVersion>
+    <PackageVersion>2.0.0-pre1</PackageVersion>
     <Authors>f-miyu</Authors>
     <DevelopmentDependency>false</DevelopmentDependency>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
