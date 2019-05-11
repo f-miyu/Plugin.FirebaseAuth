@@ -7,7 +7,7 @@
     <ProjectGuid>{52E38BFA-D096-4F6A-A249-9E4BCFFADC55}</ProjectGuid>
     <Description>Cross platform plugin for Firebase Authentication</Description>
     <PackageId>Plugin.FirebaseAuth</PackageId>
-    <PackageVersion>1.2.0-pre</PackageVersion>
+    <PackageVersion>2.0.0-pre2</PackageVersion>
     <Authors>f-miyu</Authors>
     <DevelopmentDependency>false</DevelopmentDependency>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -51,6 +51,11 @@
       <Version>0.2.2</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageFile Include="Plugin.FirebaseAuth.targets">
+      <Kind>Build</Kind>
+    </PackageFile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.Common.targets" />
   <Import Project="$(NuGetAuthoringPath)\NuGet.Packaging.Authoring.targets" Condition="Exists('$(NuGetAuthoringPath)\NuGet.Packaging.Authoring.targets')" />
