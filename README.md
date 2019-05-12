@@ -104,6 +104,13 @@ CrossFirebaseAuth.Current.Instance.IdToken += (sender, e) =>
 ```C#
 var user = CrossFirebaseAuth.Current.Instance.CurrentUser;
 ```
+By using a listener
+```C#
+var registration = CrossFirebaseAuth.Current.Instance.AddAuthStateChangedListener(auth =>
+{
+    var user = auth.CurrentUser;
+});
+```
 
 ### Update a user's profile
 ```C#
