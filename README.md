@@ -22,7 +22,7 @@ Firebase.Core.App.Configure();
 ```C#
 Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, bundle);
 ```
-* Target Framework must be Android 9.0 (Pie) and Multi-Dex needs to be enabled for the android project.
+* Target Framework must be Android 9.0 (Pie). Multi-Dex needs to be enabled if you use other libraries, Xamarin.Forms etc.
 ```xml
 <TargetFrameworkVersion>v9.0</TargetFrameworkVersion>
 <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
