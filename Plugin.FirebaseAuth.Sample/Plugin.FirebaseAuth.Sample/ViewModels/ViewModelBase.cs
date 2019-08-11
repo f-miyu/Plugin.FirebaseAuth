@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Plugin.FirebaseAuth.Sample.ViewModels
 {
-    public abstract class ViewModelBase : BindableBase, INavigationAware, IDestructible, IPageLifecycleAware
+    public abstract class ViewModelBase : BindableBase, INavigationAware, IInitialize, IDestructible, IPageLifecycleAware
     {
         public static readonly string ParameterKey = "parameter";
         public static readonly string TaskCompletionSourceKey = "taskCompletionSourceKey";
@@ -38,7 +38,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
         }
 
-        public virtual void OnNavigatingTo(INavigationParameters parameters)
+        public virtual void Initialize(INavigationParameters parameters)
         {
 
         }
@@ -63,9 +63,9 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         {
         }
 
-        public override void OnNavigatingTo(INavigationParameters parameters)
+        public override void Initialize(INavigationParameters parameters)
         {
-            base.OnNavigatingTo(parameters);
+            base.Initialize(parameters);
 
             if (parameters.GetNavigationMode() == NavigationMode.New && parameters.ContainsKey(ParameterKey))
             {
@@ -86,9 +86,9 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         {
         }
 
-        public override void OnNavigatingTo(INavigationParameters parameters)
+        public override void Initialize(INavigationParameters parameters)
         {
-            base.OnNavigatingTo(parameters);
+            base.Initialize(parameters);
 
             if (parameters.GetNavigationMode() == NavigationMode.New && parameters.ContainsKey(TaskCompletionSourceKey))
             {
@@ -129,9 +129,9 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         {
         }
 
-        public override void OnNavigatingTo(INavigationParameters parameters)
+        public override void Initialize(INavigationParameters parameters)
         {
-            base.OnNavigatingTo(parameters);
+            base.Initialize(parameters);
 
             if (parameters.GetNavigationMode() == NavigationMode.New && parameters.ContainsKey(ParameterKey))
             {

@@ -32,13 +32,13 @@ namespace Plugin.FirebaseAuth.Sample.Droid
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App(new AndroidInitializer()));
         }
-    }
 
-    public class AndroidInitializer : IPlatformInitializer
-    {
-        public void RegisterTypes(IContainerRegistry containerRegistry)
+        public class AndroidInitializer : IPlatformInitializer
         {
-            // Register any platform specific implementations
+            public void RegisterTypes(IContainerRegistry containerRegistry)
+            {
+                // Register any platform specific implementations
+            }
         }
     }
 }
