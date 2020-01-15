@@ -1,5 +1,4 @@
-﻿using System;
-using Android.Gms.Tasks;
+﻿using Android.Gms.Tasks;
 
 namespace Plugin.FirebaseAuth
 {
@@ -7,7 +6,7 @@ namespace Plugin.FirebaseAuth
 
     internal class OnCompleteHandlerListener : Java.Lang.Object, IOnCompleteListener
     {
-        private OnCompleteHandler _handler;
+        private readonly OnCompleteHandler _handler;
 
         public OnCompleteHandlerListener(OnCompleteHandler handler)
         {

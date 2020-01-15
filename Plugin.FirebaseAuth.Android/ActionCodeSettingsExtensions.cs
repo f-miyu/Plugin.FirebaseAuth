@@ -1,5 +1,4 @@
-﻿using System;
-namespace Plugin.FirebaseAuth
+﻿namespace Plugin.FirebaseAuth
 {
     internal static class ActionCodeSettingsExtensions
     {
