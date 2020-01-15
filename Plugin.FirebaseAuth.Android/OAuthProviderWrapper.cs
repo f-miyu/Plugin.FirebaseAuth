@@ -1,5 +1,4 @@
-﻿using System;
-using Firebase.Auth;
+﻿using Firebase.Auth;
 namespace Plugin.FirebaseAuth
 {
     public class OAuthProviderWrapper : IOAuthProvider

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Firebase;
-
-namespace Plugin.FirebaseAuth
+﻿namespace Plugin.FirebaseAuth
 {
     public class FirebaseAuthImplementation : IFirebaseAuth
     {
