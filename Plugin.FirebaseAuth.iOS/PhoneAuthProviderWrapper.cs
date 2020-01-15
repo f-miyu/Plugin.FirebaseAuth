@@ -14,7 +14,7 @@ namespace Plugin.FirebaseAuth
         public IPhoneAuthCredential GetCredential(IAuth auth, string verificationId, string verificationCode)
         {
             var wrapper = (AuthWrapper)auth;
-            var credential = PhoneAuthProvider.From((Auth)wrapper).GetCredential(verificationId, verificationCode);
+            var credential = PhoneAuthProvider.Create((Auth)wrapper).GetCredential(verificationId, verificationCode);
             return new PhoneAuthCredentialWrapper(credential);
         }
 
@@ -31,7 +31,7 @@ namespace Plugin.FirebaseAuth
                 var firebaseAuth = (Auth)wrapper;
                 firebaseAuth.Settings.AppVerificationDisabledForTesting = false;
 
-                var verificationId = await PhoneAuthProvider.From(firebaseAuth)
+                var verificationId = await PhoneAuthProvider.Create(firebaseAuth)
                                                             .VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
                                                             .ConfigureAwait(false);
 
@@ -56,7 +56,7 @@ namespace Plugin.FirebaseAuth
                 var firebaseAuth = (Auth)wrapper;
                 firebaseAuth.Settings.AppVerificationDisabledForTesting = true;
 
-                var verificationId = await PhoneAuthProvider.From(firebaseAuth)
+                var verificationId = await PhoneAuthProvider.Create(firebaseAuth)
                                                             .VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
                                                             .ConfigureAwait(false);
 
