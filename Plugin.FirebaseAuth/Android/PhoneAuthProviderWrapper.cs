@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using Firebase;
 using Firebase.Auth;
 using Java.Util.Concurrent;
-using Android.App;
-using System.Diagnostics;
 using Plugin.CurrentActivity;
 
 namespace Plugin.FirebaseAuth
@@ -65,7 +63,7 @@ namespace Plugin.FirebaseAuth
 
         private class Callbacks : PhoneAuthProvider.OnVerificationStateChangedCallbacks
         {
-            private TaskCompletionSource<PhoneNumberVerificationResult> _tcs;
+            private readonly TaskCompletionSource<PhoneNumberVerificationResult> _tcs;
 
             public Callbacks(TaskCompletionSource<PhoneNumberVerificationResult> tcs)
             {

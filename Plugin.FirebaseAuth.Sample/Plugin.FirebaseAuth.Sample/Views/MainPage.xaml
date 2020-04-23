@@ -4,9 +4,9 @@
              x:Class="Plugin.FirebaseAuth.Sample.Views.MainPage" 
              Title="{Binding Title}">
     <ScrollView>
-        <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
+        <StackLayout HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" >
             <Button Text="Sign up" Command="{Binding SignUpCommand}" />
-            <Button Text="Sign in with Email and Password" Command="{Binding SignInWithEmailAndPasswordCommand}" />
+            <Button Text="Sign in with Email and Password" Command="{Binding SignInWithEmailAndPasswordCommand}"/>
             <Button Text="Sign in with Google" Command="{Binding SignInWithGoogleCommand}" />
             <Button Text="Sign in with Twitter" Command="{Binding SignInWithTwitterCommand}" />
             <Button Text="Sign in with Facebook" Command="{Binding SignInWithFacebookCommand}" />

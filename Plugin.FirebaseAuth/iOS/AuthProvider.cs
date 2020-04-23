@@ -6,7 +6,7 @@ namespace Plugin.FirebaseAuth
 {
     internal static class AuthProvider
     {
-        private static ConcurrentDictionary<Auth, Lazy<AuthWrapper>> _auths = new ConcurrentDictionary<Auth, Lazy<AuthWrapper>>();
+        private static readonly ConcurrentDictionary<Auth, Lazy<AuthWrapper>> _auths = new ConcurrentDictionary<Auth, Lazy<AuthWrapper>>();
 
         public static AuthWrapper Auth => _auths.GetOrAdd(Firebase.Auth.Auth.DefaultInstance, key => new Lazy<AuthWrapper>(() => new AuthWrapper(key))).Value;
 

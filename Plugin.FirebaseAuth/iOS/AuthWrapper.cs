@@ -65,7 +65,7 @@ namespace Plugin.FirebaseAuth
             try
             {
                 var wrapper = (AuthCredentialWrapper)credential;
-                var result = await _auth.SignInAndRetrieveDataWithCredentialAsync((AuthCredential)wrapper).ConfigureAwait(false);
+                var result = await _auth.SignInWithCredentialAsync((AuthCredential)wrapper).ConfigureAwait(false);
                 return new AuthResultWrapper(result);
             }
             catch (NSErrorException e)
