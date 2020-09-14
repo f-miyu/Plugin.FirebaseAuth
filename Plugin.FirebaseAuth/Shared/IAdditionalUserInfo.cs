@@ -4,8 +4,9 @@ namespace Plugin.FirebaseAuth
 {
     public interface IAdditionalUserInfo
     {
-        IDictionary<string, object> Profile { get; }
-        string ProviderId { get; }
-        string Username { get; }
+        IDictionary<string, object?>? Profile { get; }
+        string? ProviderId { get; }
+        string? Username { get; }
+        bool IsNewUser { get; }
     }
 }

@@ -8,7 +8,6 @@ using Prism.DryIoc;
 using System.Reflection;
 using System.Linq;
 using System.Threading.Tasks;
-using Plugin.FirebaseAuth.Sample.Auth;
 
 [assembly: XamlCompilation(XamlCompilationOptions.Compile)]
 namespace Plugin.FirebaseAuth.Sample
@@ -42,7 +41,6 @@ namespace Plugin.FirebaseAuth.Sample
             }
 
             containerRegistry.RegisterForNavigation<NavigationPage>();
-            containerRegistry.RegisterSingleton<IAuthService, AuthService>();
         }
     }
 }

@@ -59,6 +59,50 @@
                     </Binding>
                 </Button.Text>
             </Button>
+            <Button Command="{Binding LinkOrUnlinkWithYahooCommand}"  HorizontalOptions="Center" >
+                <Button.Text>
+                    <Binding Path="IsLinkedWithYahoo.Value">
+                        <Binding.Converter>
+                            <converters:BoolToObjectConverter x:TypeArguments="x:String"
+                                                              TrueObject="Unlink with Yahoo"
+                                                              FalseObject="Link with Yahoo" />
+                        </Binding.Converter>
+                    </Binding>
+                </Button.Text>
+            </Button>
+            <Button Command="{Binding LinkOrUnlinkWithMicrosoftCommand}"  HorizontalOptions="Center" >
+                <Button.Text>
+                    <Binding Path="IsLinkedWithMicrosoft.Value">
+                        <Binding.Converter>
+                            <converters:BoolToObjectConverter x:TypeArguments="x:String"
+                                                              TrueObject="Unlink with Microsoft"
+                                                              FalseObject="Link with Microsoft" />
+                        </Binding.Converter>
+                    </Binding>
+                </Button.Text>
+            </Button>
+            <Button Command="{Binding LinkOrUnlinkWithAppleCommand}"  HorizontalOptions="Center" >
+                <Button.Text>
+                    <Binding Path="IsLinkedWithApple.Value">
+                        <Binding.Converter>
+                            <converters:BoolToObjectConverter x:TypeArguments="x:String"
+                                                              TrueObject="Unlink with Apple"
+                                                              FalseObject="Link with Apple" />
+                        </Binding.Converter>
+                    </Binding>
+                </Button.Text>
+            </Button>
+            <Button Command="{Binding EnrollOrUnenrollMultiFactorCommand}"  HorizontalOptions="Center" >
+                <Button.Text>
+                    <Binding Path="IsEnrolledMultiFactor.Value">
+                        <Binding.Converter>
+                            <converters:BoolToObjectConverter x:TypeArguments="x:String"
+                                                              TrueObject="Unenroll multi factor"
+                                                              FalseObject="Enroll multi factor" />
+                        </Binding.Converter>
+                    </Binding>
+                </Button.Text>
+            </Button>
             <Button Text="Sign out" Command="{Binding SignOutCommand}"  HorizontalOptions="Center" />
             <Button Text="Delete" Command="{Binding DeleteCommand}"  HorizontalOptions="Center" />
         </StackLayout>

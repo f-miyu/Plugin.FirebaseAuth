@@ -13,5 +13,8 @@ namespace Plugin.FirebaseAuth
         UserCollision,
         InvalidCredentials,
         RecentLoginRequired,
+        MultiFactor,
+        Web,
+        ApiNotAvailable,
     }
 }

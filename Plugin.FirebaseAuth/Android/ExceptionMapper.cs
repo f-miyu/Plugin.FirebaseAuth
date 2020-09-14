@@ -1,47 +1,49 @@
 ﻿using System;
+using System.Collections.Generic;
 using Firebase;
 using Firebase.Auth;
+using Java.Util;
+
 namespace Plugin.FirebaseAuth
 {
     internal static class ExceptionMapper
     {
         public static Exception Map(FirebaseException exception)
         {
-            var errorType = ErrorType.Other;
-            string reason = null;
+            var message = exception.Message;
+
             switch (exception)
             {
-                case FirebaseNetworkException firebaseNetworkException:
-                    errorType = ErrorType.NetWork;
-                    break;
-                case FirebaseTooManyRequestsException firebaseTooManyRequestsException:
-                    errorType = ErrorType.TooManyRequests;
-                    break;
-                case FirebaseAuthEmailException firebaseAuthEmailException:
-                    errorType = ErrorType.Email;
-                    break;
-                case FirebaseAuthActionCodeException firebaseAuthActionCodeException:
-                    errorType = ErrorType.ActionCode;
-                    break;
-                case FirebaseAuthInvalidUserException firebaseAuthInvalidUserException:
-                    errorType = ErrorType.InvalidUser;
-                    break;
-                case FirebaseAuthWeakPasswordException firebaseAuthWeakPasswordException:
-                    errorType = ErrorType.WeakPassword;
-                    reason = firebaseAuthWeakPasswordException.Reason;
-                    break;
-                case FirebaseAuthUserCollisionException firebaseAuthUserCollisionException:
-                    errorType = ErrorType.UserCollision;
-                    break;
-                case FirebaseAuthRecentLoginRequiredException firebaseAuthRecentLoginRequiredException:
-                    errorType = ErrorType.RecentLoginRequired;
-                    break;
-                case FirebaseAuthInvalidCredentialsException firebaseAuthInvalidCredentialsException:
-                    errorType = ErrorType.InvalidCredentials;
-                    break;
+                case FirebaseNetworkException _:
+                    return new FirebaseAuthException(message, exception, ErrorType.NetWork, null);
+                case FirebaseTooManyRequestsException _:
+                    return new FirebaseAuthException(message, exception, ErrorType.TooManyRequests, null);
+                case FirebaseApiNotAvailableException _:
+                    return new FirebaseAuthException(message, exception, ErrorType.ApiNotAvailable, null);
+                case FirebaseAuthEmailException emailException:
+                    return new FirebaseAuthException(message, exception, ErrorType.Email, emailException.ErrorCode);
+                case FirebaseAuthActionCodeException actionCodeException:
+                    return new FirebaseAuthException(message, exception, ErrorType.ActionCode, actionCodeException.ErrorCode);
+                case FirebaseAuthInvalidUserException invalidUserException:
+                    return new FirebaseAuthException(message, exception, ErrorType.InvalidUser, invalidUserException.ErrorCode);
+                case FirebaseAuthWeakPasswordException weakPasswordException:
+                    return new FirebaseAuthException(message, exception, ErrorType.WeakPassword, weakPasswordException.ErrorCode, weakPasswordException.Reason);
+                case FirebaseAuthUserCollisionException userCollisionException:
+                    return new FirebaseAuthException(message, exception, ErrorType.UserCollision, userCollisionException.ErrorCode,
+                        userCollisionException.Email,
+                        userCollisionException.UpdatedCredential != null ? AuthCredentialWrapperFactory.Create(userCollisionException.UpdatedCredential) : null);
+                case FirebaseAuthRecentLoginRequiredException recentLoginRequiredException:
+                    return new FirebaseAuthException(message, exception, ErrorType.RecentLoginRequired, recentLoginRequiredException.ErrorCode);
+                case FirebaseAuthInvalidCredentialsException invalidCredentialsException:
+                    return new FirebaseAuthException(message, exception, ErrorType.InvalidCredentials, invalidCredentialsException.ErrorCode);
+                case FirebaseAuthMultiFactorException multiFactorException:
+                    return new FirebaseAuthException(message, exception, ErrorType.MultiFactor, multiFactorException.ErrorCode,
+                        multiFactorException.Resolver != null ? new MultiFactorResolverWrapper(multiFactorException.Resolver) : null);
+                case FirebaseAuthWebException webException:
+                    return new FirebaseAuthException(message, exception, ErrorType.Web, webException.ErrorCode);
+                default:
+                    return new FirebaseAuthException(message, exception, ErrorType.Other, null);
             }
-
-            return new FirebaseAuthException(exception.Message, exception, errorType, reason);
         }
     }
 }

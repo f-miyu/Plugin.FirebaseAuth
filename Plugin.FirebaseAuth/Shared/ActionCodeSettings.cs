@@ -3,9 +3,9 @@ namespace Plugin.FirebaseAuth
 {
     public partial class ActionCodeSettings
     {
-        public string AndroidPackageName { get; private set; }
+        public string? AndroidPackageName { get; private set; }
         public bool AndroidInstallIfNotAvailable { get; private set; }
-        public string AndroidMinimumVersion { get; private set; }
+        public string? AndroidMinimumVersion { get; private set; }
 
         private bool _handleCodeInApp;
         public bool HandleCodeInApp
@@ -18,8 +18,8 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        private string _iosBundleId;
-        public string IosBundleId
+        private string? _iosBundleId;
+        public string? IosBundleId
         {
             get => _iosBundleId;
             set
@@ -29,8 +29,8 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        private string _url;
-        public string Url
+        private string? _url;
+        public string? Url
         {
             get => _url;
             set

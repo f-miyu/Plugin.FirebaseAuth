@@ -5,10 +5,12 @@ using Prism.Navigation;
 using Prism.Services;
 using Reactive.Bindings;
 using Plugin.FirebaseAuth.Sample.Extensins;
+using Plugin.FirebaseAuth.Sample.Services;
+using System.Threading.Tasks;
 
 namespace Plugin.FirebaseAuth.Sample.ViewModels
 {
-    public class SignInWithEmailAndPasswordPageViewModel : ViewModelBaseResult<IUser>
+    public class SignInWithEmailAndPasswordPageViewModel : ViewModelBaseResult<IUser>, IVerificationCodeGettable
     {
         public ReactivePropertySlim<string> Email { get; } = new ReactivePropertySlim<string>();
         public ReactivePropertySlim<string> Password { get; } = new ReactivePropertySlim<string>();
@@ -17,10 +19,13 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         public AsyncReactiveCommand ResetPasswordCommand { get; }
 
         private readonly IPageDialogService _pageDialogService;
+        private readonly MultiFactorService _multiFactorService;
 
         public SignInWithEmailAndPasswordPageViewModel(INavigationService navigationService, IPageDialogService pageDialogService) : base(navigationService)
         {
             _pageDialogService = pageDialogService;
+
+            _multiFactorService = new MultiFactorService(this);
 
             Title = "Sign In ";
 
@@ -39,6 +44,30 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                                                         .SignInWithEmailAndPasswordAsync(Email.Value, Password.Value);
 
                     await NavigationService.GoBackAsync(result.User);
+                }
+                catch (FirebaseAuthException e)
+                {
+                    if (e.Resolver == null)
+                    {
+                        System.Diagnostics.Debug.WriteLine(e);
+
+                        await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
+                    }
+                    else
+                    {
+                        try
+                        {
+                            var result = await _multiFactorService.ResolveAsync(e.Resolver);
+
+                            await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine(ex);
+
+                            await _pageDialogService.DisplayAlertAsync("Failure", ex.Message, "OK");
+                        }
+                    }
                 }
                 catch (Exception e)
                 {
@@ -70,6 +99,11 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                     await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
                 }
             });
+        }
+
+        public Task<string> GetVerificationCodeAsync()
+        {
+            return NavigationService.NavigateAsync<VerificationCodePageViewModel, string>();
         }
     }
 }

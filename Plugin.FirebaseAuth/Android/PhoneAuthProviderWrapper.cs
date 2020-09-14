@@ -13,50 +13,173 @@ namespace Plugin.FirebaseAuth
 
         public string PhoneSignInMethod => PhoneAuthProvider.PhoneSignInMethod;
 
-        public IPhoneAuthCredential GetCredential(IAuth auth, string verificationId, string verificationCode)
+        public IPhoneAuthCredential GetCredential(string verificationId, string verificationCode)
         {
             var credential = PhoneAuthProvider.GetCredential(verificationId, verificationCode);
             return new PhoneAuthCredentialWrapper(credential);
         }
 
+        public IPhoneAuthCredential GetCredential(IAuth auth, string verificationId, string verificationCode)
+        {
+            return GetCredential(verificationId, verificationCode);
+        }
+
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(string phoneNumber)
+        {
+            return VerifyPhoneNumberAsync(Firebase.Auth.FirebaseAuth.Instance, phoneNumber, TimeSpan.FromSeconds(30));
+        }
+
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(string phoneNumber, TimeSpan timeout)
+        {
+            return VerifyPhoneNumberAsync(Firebase.Auth.FirebaseAuth.Instance, phoneNumber, timeout);
+        }
+
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber)
         {
-            return VerifyPhoneNumberAsync(auth, phoneNumber, TimeSpan.FromSeconds(60));
+            return VerifyPhoneNumberAsync(auth.ToNative(), phoneNumber, TimeSpan.FromSeconds(30));
         }
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber, TimeSpan timeout)
         {
-            var activity = CrossCurrentActivity.Current.Activity ?? throw new NullReferenceException("current activity is null");
+            return VerifyPhoneNumberAsync(auth.ToNative(), phoneNumber, timeout);
+        }
 
-            var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
-            var callbacks = new Callbacks(tcs);
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(string phoneNumber, IMultiFactorSession multiFactorSession)
+        {
+            return VerifyPhoneNumberAsync(Firebase.Auth.FirebaseAuth.Instance, phoneNumber, multiFactorSession, TimeSpan.FromSeconds(30));
+        }
 
-            var wrapper = (AuthWrapper)auth;
-            var firebaseAuth = (Firebase.Auth.FirebaseAuth)wrapper;
-            firebaseAuth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(null, null);
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(string phoneNumber, IMultiFactorSession multiFactorSession, TimeSpan timeout, bool requiresSmsValidation)
+        {
+            return VerifyPhoneNumberAsync(Firebase.Auth.FirebaseAuth.Instance, phoneNumber, multiFactorSession, timeout, requiresSmsValidation);
+        }
 
-            PhoneAuthProvider.GetInstance(firebaseAuth).VerifyPhoneNumber(phoneNumber, (long)timeout.TotalMilliseconds, TimeUnit.Milliseconds, activity, callbacks);
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IPhoneMultiFactorInfo phoneMultiFactorInfo, IMultiFactorSession multiFactorSession)
+        {
+            return VerifyPhoneNumberAsync(Firebase.Auth.FirebaseAuth.Instance, phoneMultiFactorInfo, multiFactorSession, TimeSpan.FromSeconds(30));
+        }
 
-            return tcs.Task;
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IPhoneMultiFactorInfo phoneMultiFactorInfo, IMultiFactorSession multiFactorSession, TimeSpan timeout, bool requiresSmsValidation)
+        {
+            return VerifyPhoneNumberAsync(Firebase.Auth.FirebaseAuth.Instance, phoneMultiFactorInfo, multiFactorSession, timeout, requiresSmsValidation);
+        }
+
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber, IMultiFactorSession multiFactorSession)
+        {
+            return VerifyPhoneNumberAsync(auth.ToNative(), phoneNumber, multiFactorSession, TimeSpan.FromSeconds(30));
+        }
+
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber, IMultiFactorSession multiFactorSession, TimeSpan timeout, bool requiresSmsValidation)
+        {
+            return VerifyPhoneNumberAsync(auth.ToNative(), phoneNumber, multiFactorSession, timeout, requiresSmsValidation);
+        }
+
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, IPhoneMultiFactorInfo phoneMultiFactorInfo, IMultiFactorSession multiFactorSession)
+        {
+            return VerifyPhoneNumberAsync(auth.ToNative(), phoneMultiFactorInfo, multiFactorSession, TimeSpan.FromSeconds(30));
+        }
+
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, IPhoneMultiFactorInfo phoneMultiFactorInfo, IMultiFactorSession multiFactorSession, TimeSpan timeout, bool requiresSmsValidation)
+        {
+            return VerifyPhoneNumberAsync(auth.ToNative(), phoneMultiFactorInfo, multiFactorSession, timeout, requiresSmsValidation);
+        }
+
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(string phoneNumber, string verificationCode)
+        {
+            return VerifyPhoneNumberForTestingAsync(Firebase.Auth.FirebaseAuth.Instance, phoneNumber, verificationCode, TimeSpan.FromSeconds(30));
+        }
+
+        public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(string phoneNumber, string verificationCode, TimeSpan timeout)
+        {
+            return VerifyPhoneNumberForTestingAsync(Firebase.Auth.FirebaseAuth.Instance, phoneNumber, verificationCode, timeout);
         }
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode)
         {
-            return VerifyPhoneNumberForTestingAsync(auth, phoneNumber, verificationCode, TimeSpan.FromSeconds(60));
+            return VerifyPhoneNumberForTestingAsync(auth.ToNative(), phoneNumber, verificationCode, TimeSpan.FromSeconds(30));
         }
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode, TimeSpan timeout)
+        {
+            return VerifyPhoneNumberForTestingAsync(auth.ToNative(), phoneNumber, verificationCode, timeout);
+        }
+
+        private Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(Firebase.Auth.FirebaseAuth auth, string phoneNumber, TimeSpan timeout)
         {
             var activity = CrossCurrentActivity.Current.Activity ?? throw new NullReferenceException("current activity is null");
 
             var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
             var callbacks = new Callbacks(tcs);
 
-            var wrapper = (AuthWrapper)auth;
-            var firebaseAuth = (Firebase.Auth.FirebaseAuth)wrapper;
-            firebaseAuth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(phoneNumber, verificationCode);
+            auth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(null, null);
 
-            PhoneAuthProvider.GetInstance(firebaseAuth).VerifyPhoneNumber(phoneNumber, (long)timeout.TotalMilliseconds, TimeUnit.Milliseconds, activity, callbacks);
+            PhoneAuthProvider.GetInstance(auth).VerifyPhoneNumber(phoneNumber, (long)timeout.TotalMilliseconds, TimeUnit.Milliseconds, activity, callbacks);
+
+            return tcs.Task;
+        }
+
+        private Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(Firebase.Auth.FirebaseAuth auth, string phoneNumber, IMultiFactorSession multiFactorSession, TimeSpan timeout, bool? requiresSmsValidation = null)
+        {
+            var activity = CrossCurrentActivity.Current.Activity ?? throw new NullReferenceException("current activity is null");
+
+            var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
+            var callbacks = new Callbacks(tcs);
+
+            var builder = PhoneAuthOptions.NewBuilder(auth)
+                .SetActivity(activity)
+                .SetCallbacks(callbacks)
+                .SetPhoneNumber(phoneNumber)
+                .SetMultiFactorSession(multiFactorSession.ToNative())
+                .SetTimeout(new Java.Lang.Long((long)timeout.TotalMilliseconds), TimeUnit.Milliseconds);
+
+            if (requiresSmsValidation.HasValue)
+            {
+                builder.RequireSmsValidation(requiresSmsValidation.Value);
+            }
+
+            auth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(null, null);
+
+            PhoneAuthProvider.VerifyPhoneNumber(builder.Build());
+
+            return tcs.Task;
+        }
+
+        private Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(Firebase.Auth.FirebaseAuth auth, IPhoneMultiFactorInfo phoneMultiFactorInfo, IMultiFactorSession multiFactorSession, TimeSpan timeout, bool? requiresSmsValidation = null)
+        {
+            var activity = CrossCurrentActivity.Current.Activity ?? throw new NullReferenceException("current activity is null");
+
+            var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
+            var callbacks = new Callbacks(tcs);
+
+            var builder = PhoneAuthOptions.NewBuilder(auth)
+                .SetActivity(activity)
+                .SetCallbacks(callbacks)
+                .SetMultiFactorHint(phoneMultiFactorInfo.ToNative())
+                .SetMultiFactorSession(multiFactorSession.ToNative())
+                .SetTimeout(new Java.Lang.Long((long)timeout.TotalMilliseconds), TimeUnit.Milliseconds);
+
+            if (requiresSmsValidation.HasValue)
+            {
+                builder.RequireSmsValidation(requiresSmsValidation.Value);
+            }
+
+            auth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(null, null);
+
+            PhoneAuthProvider.VerifyPhoneNumber(builder.Build());
+
+            return tcs.Task;
+        }
+
+        private Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(Firebase.Auth.FirebaseAuth auth, string phoneNumber, string verificationCode, TimeSpan timeout)
+        {
+            var activity = CrossCurrentActivity.Current.Activity ?? throw new NullReferenceException("current activity is null");
+
+            var tcs = new TaskCompletionSource<PhoneNumberVerificationResult>();
+            var callbacks = new Callbacks(tcs);
+
+            auth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(phoneNumber, verificationCode);
+
+            PhoneAuthProvider.GetInstance(auth).VerifyPhoneNumber(phoneNumber, (long)timeout.TotalMilliseconds, TimeUnit.Milliseconds, activity, callbacks);
 
             return tcs.Task;
         }

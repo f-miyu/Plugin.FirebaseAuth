@@ -55,7 +55,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>firebase-auth-sample</string>
+				<string>fb[FACEBOOK_APP_ID]</string>
 			</array>
 			<key>CFBundleURLName</key>
 			<string></string>
@@ -63,17 +63,13 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>fb293961301195586</string>
-			</array>
-			<key>CFBundleURLName</key>
-			<string></string>
-		</dict>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>com.googleusercontent.apps.62192275025-tmj3869rhv7jlj4lt9ogpm4j24sa5pqf</string>
+				<string>[REVERSED_CLIENT_ID]</string>
 			</array>
 		</dict>
 	</array>
+	<key>FacebookAppID</key>
+	<string>[FACEBOOK_APP_ID]</string>
+	<key>FacebookDisplayName</key>
+	<string>Plugin.FirebaseAuth.Sample</string>
 </dict>
 </plist>

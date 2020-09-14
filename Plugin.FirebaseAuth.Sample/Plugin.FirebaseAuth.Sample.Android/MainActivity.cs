@@ -3,20 +3,21 @@ using Android.Content.PM;
 using Android.OS;
 using Prism;
 using Prism.Ioc;
-using Android.Widget;
 using Android.Content;
 using System;
-using Plugin.FirebaseAuth.Sample.Auth;
-using Xamarin.Auth;
 using Plugin.CurrentActivity;
+using Plugin.FirebaseAuth.Sample.Droid.Services;
+using Plugin.FirebaseAuth.Sample.Services;
 
 namespace Plugin.FirebaseAuth.Sample.Droid
 {
-    [Activity(Label = "Plugin.FirebaseAuth.Sample", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = true,
-              LaunchMode = LaunchMode.SingleTop,
+    [Activity(Name = "com.plugin.firebaseauth.sample.MainActivity", Label = "Plugin.FirebaseAuth.Sample", Icon = "@mipmap/ic_launcher", Theme = "@style/MainTheme", MainLauncher = true,
               ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation)]
     public class MainActivity : global::Xamarin.Forms.Platform.Android.FormsAppCompatActivity
     {
+        private FacebookService _facebookService;
+        private GoogleService _googleService;
+
         protected override void OnCreate(Bundle bundle)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
@@ -24,20 +25,37 @@ namespace Plugin.FirebaseAuth.Sample.Droid
 
             base.OnCreate(bundle);
 
+            _facebookService = new FacebookService(this);
+            _googleService = new GoogleService(this);
+
             CrossCurrentActivity.Current.Init(this, bundle);
 
-            Xamarin.Auth.Presenters.XamarinAndroid.AuthenticationConfiguration.Init(this, bundle);
-            CustomTabsConfiguration.CustomTabsClosingMessage = null;
-
             global::Xamarin.Forms.Forms.Init(this, bundle);
-            LoadApplication(new App(new AndroidInitializer()));
+            LoadApplication(new App(new AndroidInitializer(this)));
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+
+            _facebookService.OnActivetyResult(requestCode, resultCode, data);
+            _googleService.OnActivetyResult(requestCode, resultCode, data);
         }
 
         public class AndroidInitializer : IPlatformInitializer
         {
+            private readonly MainActivity _mainActivity;
+
+            public AndroidInitializer(MainActivity mainActivity)
+            {
+                _mainActivity = mainActivity;
+            }
+
             public void RegisterTypes(IContainerRegistry containerRegistry)
             {
-                // Register any platform specific implementations
+                containerRegistry.RegisterInstance<IFacebookService>(_mainActivity._facebookService);
+                containerRegistry.RegisterInstance<IGoogleService>(_mainActivity._googleService);
+                containerRegistry.RegisterSingleton<IAppleService, AppleService>();
             }
         }
     }

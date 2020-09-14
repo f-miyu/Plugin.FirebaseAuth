@@ -2,9 +2,9 @@
 using Prism;
 using Prism.Ioc;
 using UIKit;
-using System.Xml;
-using System;
-using Plugin.FirebaseAuth.Sample.Auth;
+using Plugin.FirebaseAuth.Sample.Services;
+using Plugin.FirebaseAuth.Sample.iOS.Services;
+using Google.SignIn;
 
 namespace Plugin.FirebaseAuth.Sample.iOS
 {
@@ -25,8 +25,6 @@ namespace Plugin.FirebaseAuth.Sample.iOS
         {
             Firebase.Core.App.Configure();
 
-            Xamarin.Auth.Presenters.XamarinIOS.AuthenticationConfiguration.Init();
-
             global::Xamarin.Forms.Forms.Init();
             LoadApplication(new App(new iOSInitializer()));
 
@@ -35,11 +33,7 @@ namespace Plugin.FirebaseAuth.Sample.iOS
 
         public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
         {
-            var uri = new Uri(url.AbsoluteString);
-
-            AuthenticationState.Authenticator.OnPageLoaded(uri);
-
-            return true;
+            return SignIn.SharedInstance.HandleUrl(url);
         }
     }
 
@@ -47,7 +41,9 @@ namespace Plugin.FirebaseAuth.Sample.iOS
     {
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            // Register any platform specific implementations
+            containerRegistry.RegisterSingleton<IFacebookService, FacebookService>();
+            containerRegistry.RegisterSingleton<IGoogleService, GoogleService>();
+            containerRegistry.RegisterSingleton<IAppleService, AppleService>();
         }
     }
 }

@@ -20,7 +20,11 @@ namespace Plugin.FirebaseAuth
 
         public IOAuthProvider OAuthProvider { get; } = new OAuthProviderWrapper();
 
-        public IPlayGamesAuthProvider PlayGamesAuthProvider { get; } = new PlayGamesAuthProviderWrapper();
+        public IPlayGamesAuthProvider? PlayGamesAuthProvider { get; } = new PlayGamesAuthProviderWrapper();
+
+        public IGameCenterAuthProvider? GameCenterAuthProvider { get; }
+
+        public IPhoneMultiFactorGenerator PhoneMultiFactorGenerator { get; } = new PhoneMultiFactorGeneratorWrapper();
 
         public IAuth Instance => AuthProvider.Auth;
 

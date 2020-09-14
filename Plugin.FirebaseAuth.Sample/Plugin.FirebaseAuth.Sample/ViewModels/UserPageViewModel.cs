@@ -2,27 +2,43 @@
 using Prism.Navigation;
 using Reactive.Bindings;
 using Prism.Services;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Plugin.FirebaseAuth.Sample.Extensins;
 using System.Reactive.Linq;
-using Plugin.FirebaseAuth.Sample.Auth;
 using System.Linq;
-using System.Reactive.Subjects;
-using System.Reactive;
-using System.Xml;
+using Plugin.FirebaseAuth.Sample.Services;
 
 namespace Plugin.FirebaseAuth.Sample.ViewModels
 {
-    public class UserPageViewModel : ViewModelBase
+    public class UserPageViewModel : ViewModelBase, IVerificationCodeGettable
     {
         public ReactivePropertySlim<string> Name { get; }
         public ReactivePropertySlim<string> Email { get; }
         public ReactivePropertySlim<string> PhoneNumber { get; }
-        public ReadOnlyReactivePropertySlim<bool> IsLinkedWithGoogle { get; }
-        public ReadOnlyReactivePropertySlim<bool> IsLinkedWithTwitter { get; }
-        public ReadOnlyReactivePropertySlim<bool> IsLinkedWithFacebook { get; }
-        public ReadOnlyReactivePropertySlim<bool> IsLinkedWithGitHub { get; }
+
+        private readonly ReactivePropertySlim<bool> _isLinkedWithGoogle = new ReactivePropertySlim<bool>();
+        public IReadOnlyReactiveProperty<bool> IsLinkedWithGoogle => _isLinkedWithGoogle;
+
+        private readonly ReactivePropertySlim<bool> _isLinkedWithTwitter = new ReactivePropertySlim<bool>();
+        public IReadOnlyReactiveProperty<bool> IsLinkedWithTwitter => _isLinkedWithTwitter;
+
+        private readonly ReactivePropertySlim<bool> _isLinkedWithFacebook = new ReactivePropertySlim<bool>();
+        public IReadOnlyReactiveProperty<bool> IsLinkedWithFacebook => _isLinkedWithFacebook;
+
+        private readonly ReactivePropertySlim<bool> _isLinkedWithGitHub = new ReactivePropertySlim<bool>();
+        public IReadOnlyReactiveProperty<bool> IsLinkedWithGitHub => _isLinkedWithGitHub;
+
+        private readonly ReactivePropertySlim<bool> _isLinkedWithYahoo = new ReactivePropertySlim<bool>();
+        public IReadOnlyReactiveProperty<bool> IsLinkedWithYahoo => _isLinkedWithYahoo;
+
+        private readonly ReactivePropertySlim<bool> _isLinkedWithMicrosoft = new ReactivePropertySlim<bool>();
+        public IReadOnlyReactiveProperty<bool> IsLinkedWithMicrosoft => _isLinkedWithMicrosoft;
+
+        private readonly ReactivePropertySlim<bool> _isLinkedWithApple = new ReactivePropertySlim<bool>();
+        public IReadOnlyReactiveProperty<bool> IsLinkedWithApple => _isLinkedWithApple;
+
+        private readonly ReactivePropertySlim<bool> _isEnrolledMultiFactor = new ReactivePropertySlim<bool>();
+        public IReadOnlyReactiveProperty<bool> IsEnrolledMultiFactor => _isEnrolledMultiFactor;
 
         public AsyncReactiveCommand UpdateNameCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand UpdateEmailCommand { get; } = new AsyncReactiveCommand();
@@ -32,71 +48,110 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         public AsyncReactiveCommand LinkOrUnlinkWithTwitterCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand LinkOrUnlinkWithFacebookCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand LinkOrUnlinkWithGitHubCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand LinkOrUnlinkWithYahooCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand LinkOrUnlinkWithMicrosoftCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand LinkOrUnlinkWithAppleCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand EnrollOrUnenrollMultiFactorCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand DeleteCommand { get; } = new AsyncReactiveCommand();
 
         private readonly IPageDialogService _pageDialogService;
-        private readonly IAuthService _authService;
+        private readonly IGoogleService _googleService;
+        private readonly IFacebookService _facebookService;
+        private readonly IAppleService _appleService;
 
-        private ReactivePropertySlim<IUser> _user = new ReactivePropertySlim<IUser>();
+        private readonly MultiFactorService _multiFactorService;
 
-        public UserPageViewModel(INavigationService navigationService, IPageDialogService pageDialogService, IAuthService authService) : base(navigationService)
+        private readonly IAuth _auth = CrossFirebaseAuth.Current.Instance;
+
+        public UserPageViewModel(INavigationService navigationService, IPageDialogService pageDialogService, IGoogleService googleService, IFacebookService facebookService, IAppleService appleService) : base(navigationService)
         {
             _pageDialogService = pageDialogService;
-            _authService = authService;
+            _googleService = googleService;
+            _facebookService = facebookService;
+            _appleService = appleService;
+
+            _multiFactorService = new MultiFactorService(this);
 
             Title = "User";
 
-            _user.Value = CrossFirebaseAuth.Current.Instance.CurrentUser;
+            var user = _auth.CurrentUser;
 
-            Name = new ReactivePropertySlim<string>(_user.Value?.DisplayName);
-            Email = new ReactivePropertySlim<string>(_user.Value?.Email);
-            PhoneNumber = new ReactivePropertySlim<string>(_user.Value?.PhoneNumber);
+            Update(user);
 
-            IsLinkedWithGoogle = _user.Where(user => user != null)
-                                      .Select(user => user.ProviderData.FirstOrDefault(data => data.ProviderId == CrossFirebaseAuth.Current.GoogleAuthProvider.ProviderId) != null)
-                                      .ToReadOnlyReactivePropertySlim();
+            Name = new ReactivePropertySlim<string>(user?.DisplayName);
+            Email = new ReactivePropertySlim<string>(user?.Email);
+            PhoneNumber = new ReactivePropertySlim<string>(user?.PhoneNumber);
 
-            IsLinkedWithTwitter = _user.Where(user => user != null)
-                                       .Select(user => user.ProviderData.FirstOrDefault(data => data.ProviderId == CrossFirebaseAuth.Current.TwitterAuthProvider.ProviderId) != null)
-                                       .ToReadOnlyReactivePropertySlim();
-
-            IsLinkedWithFacebook = _user.Where(user => user != null)
-                                        .Select(user => user.ProviderData.FirstOrDefault(data => data.ProviderId == CrossFirebaseAuth.Current.FacebookAuthProvider.ProviderId) != null)
-                                        .ToReadOnlyReactivePropertySlim();
-
-            IsLinkedWithGitHub = _user.Where(user => user != null)
-                                      .Select(user => user.ProviderData.FirstOrDefault(data => data.ProviderId == CrossFirebaseAuth.Current.GitHubAuthProvider.ProviderId) != null)
-                                      .ToReadOnlyReactivePropertySlim();
-
-            _user.Where(user => user != null)
-                 .Select(user => user.DisplayName)
-                 .DistinctUntilChanged()
-                 .Subscribe(name => Name.Value = name);
-
-            _user.Where(user => user != null)
-                 .Select(user => user.Email)
-                 .DistinctUntilChanged()
-                 .Subscribe(email => Email.Value = email);
-
-            _user.Where(user => user != null)
-                 .Select(user => user.PhoneNumber)
-                 .DistinctUntilChanged()
-                 .Subscribe(phoneNumber => PhoneNumber.Value = phoneNumber);
+            _isEnrolledMultiFactor.Value = user.MultiFactor.EnrolledFactors.Any();
 
             UpdateNameCommand.Subscribe(UpdateName);
             UpdateEmailCommand.Subscribe(UpdateEmail);
             UpdatePhoneNumberCommand.Subscribe(UpdatePhoneNumber);
             SignOutCommand.Subscribe(SignOut);
-            LinkOrUnlinkWithGoogleCommand.Subscribe(() => IsLinkedWithGoogle.Value ? UnlinkWithGoogle() : LinkWithGoogle());
-            LinkOrUnlinkWithTwitterCommand.Subscribe(() => IsLinkedWithTwitter.Value ? UnlinkWithTwitter() : LinkWithTwitter());
-            LinkOrUnlinkWithFacebookCommand.Subscribe(() => IsLinkedWithFacebook.Value ? UnlinkWithFacebook() : LinkWithFacebook());
-            LinkOrUnlinkWithGitHubCommand.Subscribe(() => IsLinkedWithGitHub.Value ? UnlinkWithGitHub() : LinkWithGitHub());
+            LinkOrUnlinkWithGoogleCommand.Subscribe(() => IsLinkedWithGoogle.Value ? UnlinkWithProvider("google.com") : LinkWithGoogle());
+            LinkOrUnlinkWithTwitterCommand.Subscribe(() => IsLinkedWithTwitter.Value ? UnlinkWithProvider("twitter.com") : LinkWithProvider("twitter.com"));
+            LinkOrUnlinkWithFacebookCommand.Subscribe(() => IsLinkedWithFacebook.Value ? UnlinkWithProvider("facebook.com") : LinkWithFacebook());
+            LinkOrUnlinkWithGitHubCommand.Subscribe(() => IsLinkedWithGitHub.Value ? UnlinkWithProvider("github.com") : LinkWithProvider("github.com"));
+            LinkOrUnlinkWithYahooCommand.Subscribe(() => IsLinkedWithYahoo.Value ? UnlinkWithProvider("yahoo.com") : LinkWithProvider("yahoo.com"));
+            LinkOrUnlinkWithMicrosoftCommand.Subscribe(() => IsLinkedWithMicrosoft.Value ? UnlinkWithProvider("microsoft.com") : LinkWithProvider("microsoft.com"));
+            LinkOrUnlinkWithAppleCommand.Subscribe(() => IsLinkedWithApple.Value ? UnlinkWithProvider("apple.com") : LinkWithApple());
+            EnrollOrUnenrollMultiFactorCommand.Subscribe(() => IsEnrolledMultiFactor.Value ? UnenrollMultiFactor() : EnrollMultiFactor());
             DeleteCommand.Subscribe(Delete);
+        }
+
+        private void Update(IUser user)
+        {
+            if (user != null)
+            {
+                var isLinkedWithGoogle = false;
+                var isLinkedWithTwitter = false;
+                var isLinkedWithFacebook = false;
+                var isLinkedWithGitHub = false;
+                var isLinkedWithYahoo = false;
+                var isLinkedWithMicrosoft = false;
+                var isLindedWithApple = false;
+
+                foreach (var info in user.ProviderData)
+                {
+                    switch (info.ProviderId)
+                    {
+                        case "google.com":
+                            isLinkedWithGoogle = true;
+                            break;
+                        case "twitter.com":
+                            isLinkedWithTwitter = true;
+                            break;
+                        case "facebook.com":
+                            isLinkedWithFacebook = true;
+                            break;
+                        case "github.com":
+                            isLinkedWithGitHub = true;
+                            break;
+                        case "yahoo.com":
+                            isLinkedWithYahoo = true;
+                            break;
+                        case "microsoft.com":
+                            isLinkedWithMicrosoft = true;
+                            break;
+                        case "apple.com":
+                            isLindedWithApple = true;
+                            break;
+                    }
+                }
+
+                _isLinkedWithGoogle.Value = isLinkedWithGoogle;
+                _isLinkedWithTwitter.Value = isLinkedWithTwitter;
+                _isLinkedWithFacebook.Value = isLinkedWithFacebook;
+                _isLinkedWithGitHub.Value = isLinkedWithGitHub;
+                _isLinkedWithYahoo.Value = isLinkedWithYahoo;
+                _isLinkedWithMicrosoft.Value = isLinkedWithMicrosoft;
+                _isLinkedWithApple.Value = isLindedWithApple;
+            }
         }
 
         private async Task UpdateName()
         {
-            var user = _user.Value;
+            var user = _auth.CurrentUser;
             if (user == null) return;
 
             try
@@ -115,7 +170,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
         private async Task UpdateEmail()
         {
-            var user = _user.Value;
+            var user = CrossFirebaseAuth.Current.Instance.CurrentUser;
             if (user == null) return;
 
             try
@@ -134,13 +189,13 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
         private async Task UpdatePhoneNumber()
         {
-            var user = _user.Value;
+            var user = _auth.CurrentUser;
             if (user == null) return;
 
             try
             {
                 var verificationResult = await CrossFirebaseAuth.Current.PhoneAuthProvider
-                                                                .VerifyPhoneNumberAsync(CrossFirebaseAuth.Current.Instance, PhoneNumber.Value);
+                    .VerifyPhoneNumberAsync(PhoneNumber.Value);
 
                 if (verificationResult.Credential != null)
                 {
@@ -188,97 +243,26 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
         private async Task LinkWithGoogle()
         {
-            var user = _user.Value;
+            var user = _auth.CurrentUser;
             if (user == null) return;
 
             try
             {
-                var (idToken, accessToken) = await _authService.LoginWithGoogle();
+                var (idToken, accessToken) = await _googleService.GetCredentialAsync();
 
-                if (idToken != null)
-                {
-                    var credential = CrossFirebaseAuth.Current
-                                                      .GoogleAuthProvider
-                                                      .GetCredential(idToken, accessToken);
+                var credential = CrossFirebaseAuth.Current
+                    .GoogleAuthProvider
+                    .GetCredential(idToken, accessToken);
 
-                    var result = await user.LinkWithCredentialAsync(credential);
+                var result = await user.LinkWithCredentialAsync(credential);
 
-                    _user.Value = result.User;
+                Update(user);
 
-                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
-                }
+                await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
             }
-            catch (Exception e)
+            catch (FirebaseAuthException e)
             {
-                System.Diagnostics.Debug.WriteLine(e);
-
-                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
-            }
-        }
-
-        private async Task UnlinkWithGoogle()
-        {
-            var user = _user.Value;
-            if (user == null) return;
-
-            try
-            {
-                var result = await user.UnlinkAsync(CrossFirebaseAuth.Current.GoogleAuthProvider.ProviderId);
-
-                _user.Value = result;
-
-                await _pageDialogService.DisplayAlertAsync("Success", result.DisplayName, "OK");
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(e);
-
-                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
-            }
-        }
-
-        private async Task LinkWithTwitter()
-        {
-            var user = _user.Value;
-            if (user == null) return;
-
-            try
-            {
-                var (token, secret) = await _authService.LoginWithTwitter();
-
-                if (token != null && secret != null)
-                {
-                    var credential = CrossFirebaseAuth.Current
-                                                      .TwitterAuthProvider
-                                                      .GetCredential(token, secret);
-
-                    var result = await user.LinkWithCredentialAsync(credential);
-
-                    _user.Value = result.User;
-
-                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
-                }
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(e);
-
-                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
-            }
-        }
-
-        private async Task UnlinkWithTwitter()
-        {
-            var user = _user.Value;
-            if (user == null) return;
-
-            try
-            {
-                var result = await user.UnlinkAsync(CrossFirebaseAuth.Current.TwitterAuthProvider.ProviderId);
-
-                _user.Value = result;
-
-                await _pageDialogService.DisplayAlertAsync("Success", result.DisplayName, "OK");
+                await ResolveAsync(e);
             }
             catch (Exception e)
             {
@@ -290,76 +274,70 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
         private async Task LinkWithFacebook()
         {
-            var user = _user.Value;
+            var user = _auth.CurrentUser;
             if (user == null) return;
 
             try
             {
-                var accessToken = await _authService.LoginWithFacebook();
+                var accessToken = await _facebookService.GetCredentialAsync();
 
-                if (accessToken != null)
+                var credential = CrossFirebaseAuth.Current
+                    .FacebookAuthProvider
+                    .GetCredential(accessToken);
+
+                var result = await user.LinkWithCredentialAsync(credential);
+
+                Update(user);
+
+                await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+            }
+            catch (FirebaseAuthException e)
+            {
+                await ResolveAsync(e);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+
+                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
+            }
+        }
+
+        private async Task LinkWithApple()
+        {
+            var user = _auth.CurrentUser;
+            if (user == null) return;
+
+            try
+            {
+                IAuthResult result;
+
+                var (idToken, rawNonce) = await _appleService.GetCredentialAsync();
+                if (idToken != null)
                 {
                     var credential = CrossFirebaseAuth.Current
-                                                      .FacebookAuthProvider
-                                                      .GetCredential(accessToken);
+                        .OAuthProvider
+                        .GetCredential("apple.com", idToken, rawNonce: rawNonce);
 
-                    var result = await user.LinkWithCredentialAsync(credential);
-
-                    _user.Value = result.User;
-
-                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+                    result = await user.LinkWithCredentialAsync(credential);
                 }
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(e);
-
-                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
-            }
-        }
-
-        private async Task UnlinkWithFacebook()
-        {
-            var user = _user.Value;
-            if (user == null) return;
-
-            try
-            {
-                var result = await user.UnlinkAsync(CrossFirebaseAuth.Current.FacebookAuthProvider.ProviderId);
-
-                _user.Value = result;
-
-                await _pageDialogService.DisplayAlertAsync("Success", result.DisplayName, "OK");
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(e);
-
-                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
-            }
-        }
-
-        private async Task LinkWithGitHub()
-        {
-            var user = _user.Value;
-            if (user == null) return;
-
-            try
-            {
-                var accessToken = await _authService.LoginWithGitHub();
-
-                if (accessToken != null)
+                else
                 {
-                    var credential = CrossFirebaseAuth.Current
-                                                      .GitHubAuthProvider
-                                                      .GetCredential(accessToken);
+                    var porvider = new OAuthProvider("apple.com")
+                    {
+                        Scopes = new[] { "email", "name" }
+                    };
 
-                    var result = await user.LinkWithCredentialAsync(credential);
-
-                    _user.Value = result.User;
-
-                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+                    result = await user.LinkWithProviderAsync(porvider);
                 }
+
+                Update(user);
+
+                await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+            }
+            catch (FirebaseAuthException e)
+            {
+                await ResolveAsync(e);
             }
             catch (Exception e)
             {
@@ -369,16 +347,43 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
             }
         }
 
-        private async Task UnlinkWithGitHub()
+        private async Task LinkWithProvider(string providerId)
         {
-            var user = _user.Value;
+            var user = _auth.CurrentUser;
             if (user == null) return;
 
             try
             {
-                var result = await user.UnlinkAsync(CrossFirebaseAuth.Current.GitHubAuthProvider.ProviderId);
+                var porvider = new OAuthProvider(providerId);
 
-                _user.Value = result;
+                var result = await user.LinkWithProviderAsync(porvider);
+
+                Update(user);
+
+                await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+            }
+            catch (FirebaseAuthException e)
+            {
+                await ResolveAsync(e);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+
+                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
+            }
+        }
+
+        private async Task UnlinkWithProvider(string providerId)
+        {
+            var user = _auth.CurrentUser;
+            if (user == null) return;
+
+            try
+            {
+                var result = await user.UnlinkAsync(providerId);
+
+                Update(user);
 
                 await _pageDialogService.DisplayAlertAsync("Success", result.DisplayName, "OK");
             }
@@ -392,7 +397,7 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
         private async Task Delete()
         {
-            var user = _user.Value;
+            var user = _auth.CurrentUser;
             if (user == null) return;
 
             try
@@ -409,6 +414,92 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
                 await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
             }
+        }
+
+        private async Task EnrollMultiFactor()
+        {
+            var user = _auth.CurrentUser;
+            if (user == null) return;
+
+            try
+            {
+                var session = await user.MultiFactor.GetSessionAsync();
+
+                var credential = await NavigationService.NavigateAsync<SignInWithPhoneNumberPageViewModel, IMultiFactorSession, IPhoneAuthCredential>(session);
+
+                if (credential == null)
+                {
+                    await _pageDialogService.DisplayAlertAsync("Failure", "Cancelled", "OK");
+                    return;
+                }
+
+                var assertion = CrossFirebaseAuth.Current.PhoneMultiFactorGenerator.GetAssertion(credential);
+
+                await user.MultiFactor.EnrollAsync(assertion, null);
+
+                _isEnrolledMultiFactor.Value = true;
+
+                await _pageDialogService.DisplayAlertAsync("Success", null, "OK");
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+
+                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
+            }
+        }
+
+        private async Task UnenrollMultiFactor()
+        {
+            var user = _auth.CurrentUser;
+            if (user == null) return;
+
+            try
+            {
+                var multiFactor = user.MultiFactor;
+
+                await Task.WhenAll(multiFactor.EnrolledFactors.Select(info => multiFactor.UnenrollAsync(info)));
+
+                _isEnrolledMultiFactor.Value = false;
+
+                await _pageDialogService.DisplayAlertAsync("Success", null, "OK");
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+
+                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
+            }
+        }
+
+        private async Task ResolveAsync(FirebaseAuthException firebaseAuthException)
+        {
+            if (firebaseAuthException.Resolver == null)
+            {
+                System.Diagnostics.Debug.WriteLine(firebaseAuthException);
+
+                await _pageDialogService.DisplayAlertAsync("Failure", firebaseAuthException.Message, "OK");
+            }
+            else
+            {
+                try
+                {
+                    var result = await _multiFactorService.ResolveAsync(firebaseAuthException.Resolver);
+
+                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex);
+
+                    await _pageDialogService.DisplayAlertAsync("Failure", ex.Message, "OK");
+                }
+            }
+        }
+
+        public Task<string> GetVerificationCodeAsync()
+        {
+            return NavigationService.NavigateAsync<VerificationCodePageViewModel, string>();
         }
     }
 }

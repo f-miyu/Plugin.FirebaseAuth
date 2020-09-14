@@ -5,7 +5,7 @@ namespace Plugin.FirebaseAuth
 {
     internal static class ActionCodeSettingsExtensions
     {
-        public static Firebase.Auth.ActionCodeSettings ToNative(this ActionCodeSettings self)
+        public static Firebase.Auth.ActionCodeSettings? ToNative(this ActionCodeSettings self)
         {
             if (self == null) return null;
 

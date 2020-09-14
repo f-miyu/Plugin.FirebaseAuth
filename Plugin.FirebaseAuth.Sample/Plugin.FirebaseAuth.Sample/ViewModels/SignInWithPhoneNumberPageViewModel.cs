@@ -9,12 +9,13 @@ using System.Threading.Tasks;
 
 namespace Plugin.FirebaseAuth.Sample.ViewModels
 {
-    public class SignInWithPhoneNumberPageViewModel : ViewModelBaseResult<IAuthResult>
+    public class SignInWithPhoneNumberPageViewModel : ViewModelBase<IMultiFactorSession, IPhoneAuthCredential>
     {
         public ReactivePropertySlim<string> PhoneNumber { get; } = new ReactivePropertySlim<string>();
         public AsyncReactiveCommand SignInCommand { get; }
 
         private readonly IPageDialogService _pageDialogService;
+        private IMultiFactorSession _multiFactorSession;
 
         public SignInWithPhoneNumberPageViewModel(INavigationService navigationService, IPageDialogService pageDialogService) : base(navigationService)
         {
@@ -28,14 +29,22 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
             {
                 try
                 {
-                    var verificationResult = await CrossFirebaseAuth.Current.PhoneAuthProvider
-                                                                    .VerifyPhoneNumberAsync(CrossFirebaseAuth.Current.Instance, PhoneNumber.Value);
+                    PhoneNumberVerificationResult verificationResult;
+
+                    if (_multiFactorSession != null)
+                    {
+                        verificationResult = await CrossFirebaseAuth.Current.PhoneAuthProvider
+                            .VerifyPhoneNumberAsync(PhoneNumber.Value, _multiFactorSession);
+                    }
+                    else
+                    {
+                        verificationResult = await CrossFirebaseAuth.Current.PhoneAuthProvider
+                            .VerifyPhoneNumberAsync(PhoneNumber.Value);
+                    }
 
                     if (verificationResult.Credential != null)
                     {
-                        var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(verificationResult.Credential);
-
-                        await NavigationService.GoBackAsync(result);
+                        await NavigationService.GoBackAsync(verificationResult.Credential);
                     }
                     else
                     {
@@ -43,11 +52,12 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
                         if (verificationCode != null)
                         {
-                            var credential = CrossFirebaseAuth.Current.PhoneAuthProvider.GetCredential(CrossFirebaseAuth.Current.Instance, verificationResult.VerificationId, verificationCode);
+                            var credential = CrossFirebaseAuth.Current.PhoneAuthProvider
+                                .GetCredential(verificationResult.VerificationId, verificationCode);
 
-                            var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
+                            await Task.Delay(TimeSpan.FromMilliseconds(1));
 
-                            await NavigationService.GoBackAsync(result);
+                            await NavigationService.GoBackAsync(credential);
                         }
                     }
                 }
@@ -58,6 +68,11 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
                     await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
                 }
             });
+        }
+
+        public override void Prepare(IMultiFactorSession parameer)
+        {
+            _multiFactorSession = parameer;
         }
     }
 }

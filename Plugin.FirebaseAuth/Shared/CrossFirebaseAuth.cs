@@ -6,7 +6,7 @@ namespace Plugin.FirebaseAuth
     /// </summary>
     public static class CrossFirebaseAuth
     {
-        static Lazy<IFirebaseAuth> implementation = new Lazy<IFirebaseAuth>(() => CreateFirebaseAuth(), System.Threading.LazyThreadSafetyMode.PublicationOnly);
+        static Lazy<IFirebaseAuth?> implementation = new Lazy<IFirebaseAuth?>(() => CreateFirebaseAuth(), System.Threading.LazyThreadSafetyMode.PublicationOnly);
 
         /// <summary>
         /// Gets if the plugin is supported on the current platform.
@@ -20,7 +20,7 @@ namespace Plugin.FirebaseAuth
         {
             get
             {
-                IFirebaseAuth ret = implementation.Value;
+                IFirebaseAuth? ret = implementation.Value;
                 if (ret == null)
                 {
                     throw NotImplementedInReferenceAssembly();
@@ -29,9 +29,9 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        static IFirebaseAuth CreateFirebaseAuth()
+        static IFirebaseAuth? CreateFirebaseAuth()
         {
-#if NETSTANDARD1_0 || NETSTANDARD2_0
+#if NETSTANDARD
             return null;
 #else
 #pragma warning disable IDE0022 // Use expression body for methods

@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Plugin.FirebaseAuth
 {
-    public interface IAuthCredential
+    public partial interface IAuthCredential
     {
         string Provider { get; }
     }

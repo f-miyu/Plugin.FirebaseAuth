@@ -4,36 +4,32 @@ using Firebase;
 using System.Linq;
 using Firebase.Auth;
 using Android.Gms.Extensions;
+using Plugin.CurrentActivity;
 
 namespace Plugin.FirebaseAuth
 {
-    public class AuthWrapper : IAuth
+    public class AuthWrapper : IAuth, IEquatable<AuthWrapper>
     {
-        public event EventHandler<AuthStateEventArgs> AuthState;
-
-        public event EventHandler<IdTokenEventArgs> IdToken;
-
-        public IUser CurrentUser => _auth.CurrentUser != null ? new UserWrapper(_auth.CurrentUser) : null;
-
-        public string LanguageCode
-        {
-            get => _auth.LanguageCode;
-            set => _auth.LanguageCode = value;
-        }
-
         private readonly Firebase.Auth.FirebaseAuth _auth;
 
         public AuthWrapper(Firebase.Auth.FirebaseAuth auth)
         {
-            _auth = auth;
+            _auth = auth ?? throw new ArgumentNullException(nameof(auth));
 
             _auth.AuthState += OnAuthStateChanged;
             _auth.IdToken += OnIdTokenChanged;
         }
 
-        public static explicit operator Firebase.Auth.FirebaseAuth(AuthWrapper wrapper)
+        public event EventHandler<AuthStateEventArgs>? AuthState;
+
+        public event EventHandler<IdTokenEventArgs>? IdToken;
+
+        public IUser? CurrentUser => _auth.CurrentUser != null ? new UserWrapper(_auth.CurrentUser) : null;
+
+        public string? LanguageCode
         {
-            return wrapper._auth;
+            get => _auth.LanguageCode;
+            set => _auth.LanguageCode = value;
         }
 
         public async Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password)
@@ -66,8 +62,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var wrapper = (AuthCredentialWrapper)credential;
-                var result = await _auth.SignInWithCredentialAsync((AuthCredential)wrapper).ConfigureAwait(false);
+                var result = await _auth.SignInWithCredentialAsync(credential.ToNative()).ConfigureAwait(false);
                 return new AuthResultWrapper(result);
             }
             catch (FirebaseException e)
@@ -115,12 +110,27 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task<string[]> FetchProvidersForEmailAsync(string email)
+        public async Task<IAuthResult> SignInWithProviderAsync(IFederatedAuthProvider federatedAuthProvider)
         {
+            var activity = CrossCurrentActivity.Current.Activity ?? throw new NullReferenceException("current activity is null");
+
             try
             {
-                var result = await _auth.FetchProvidersForEmailAsync(email).ConfigureAwait(false);
-                return result.Providers.ToArray();
+                Firebase.Auth.IAuthResult result;
+
+                var pendingResultTask = _auth.GetPendingAuthResult();
+
+                if (pendingResultTask != null)
+                {
+                    result = await pendingResultTask.AsAsync<Firebase.Auth.IAuthResult>().ConfigureAwait(false);
+                }
+                else
+                {
+                    result = await _auth.StartActivityForSignInWithProvider(activity, federatedAuthProvider.ToNative()).AsAsync<Firebase.Auth.IAuthResult>()
+                        .ConfigureAwait(false);
+                }
+
+                return new AuthResultWrapper(result);
             }
             catch (FirebaseException e)
             {
@@ -230,8 +240,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var wrapper = (UserWrapper)user;
-                await _auth.UpdateCurrentUser((FirebaseUser)wrapper).AsAsync().ConfigureAwait(false);
+                await _auth.UpdateCurrentUser(user.ToNative()).AsAsync().ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -271,28 +280,64 @@ namespace Plugin.FirebaseAuth
             return new IdTokenChangedListenerRegistration(_auth, listener);
         }
 
+        public void UseUserAccessGroup(string? accessGroup)
+        {
+        }
+
+        public IUser? GetStoredUser(string? accessGroup)
+        {
+            return null;
+        }
+
         private void OnAuthStateChanged(object sender, Firebase.Auth.FirebaseAuth.AuthStateEventArgs e)
         {
-            var auth = e.Auth == null ? null : AuthProvider.GetAuth(e.Auth);
-            AuthState?.Invoke(this, new AuthStateEventArgs(auth));
+            AuthState?.Invoke(this, new AuthStateEventArgs(AuthProvider.GetAuth(e.Auth)));
         }
 
         private void OnIdTokenChanged(object sender, Firebase.Auth.FirebaseAuth.IdTokenEventArgs e)
         {
-            var auth = e.Auth == null ? null : AuthProvider.GetAuth(e.Auth);
-            IdToken?.Invoke(this, new IdTokenEventArgs(auth));
+            IdToken?.Invoke(this, new IdTokenEventArgs(AuthProvider.GetAuth(e.Auth)));
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as AuthWrapper);
+        }
+
+        public bool Equals(AuthWrapper? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (GetType() != other.GetType()) return false;
+            if (ReferenceEquals(_auth, other._auth)) return true;
+            return _auth.Equals(other._auth);
+        }
+
+        public override int GetHashCode()
+        {
+            return _auth.GetHashCode();
+        }
+
+        Firebase.Auth.FirebaseAuth IAuth.ToNative()
+        {
+            return _auth;
         }
 
         private class AuthStateChangedListenerRegistration : IListenerRegistration
         {
             private readonly Firebase.Auth.FirebaseAuth _instance;
-            private Firebase.Auth.FirebaseAuth.IAuthStateListener _listener;
+            private Firebase.Auth.FirebaseAuth.IAuthStateListener? _listener;
 
             public AuthStateChangedListenerRegistration(Firebase.Auth.FirebaseAuth instance, AuthStateChangedHandler handler)
             {
                 _instance = instance;
                 _listener = new AuthStateListener(handler);
                 _instance.AddAuthStateListener(_listener);
+            }
+
+            public void Dispose()
+            {
+                Remove();
             }
 
             public void Remove()
@@ -315,7 +360,7 @@ namespace Plugin.FirebaseAuth
 
                 public void OnAuthStateChanged(Firebase.Auth.FirebaseAuth auth)
                 {
-                    _handler?.Invoke(auth == null ? null : AuthProvider.GetAuth(auth));
+                    _handler?.Invoke(AuthProvider.GetAuth(auth));
                 }
             }
         }
@@ -323,13 +368,18 @@ namespace Plugin.FirebaseAuth
         private class IdTokenChangedListenerRegistration : IListenerRegistration
         {
             private readonly Firebase.Auth.FirebaseAuth _instance;
-            private Firebase.Auth.FirebaseAuth.IIdTokenListener _listener;
+            private Firebase.Auth.FirebaseAuth.IIdTokenListener? _listener;
 
             public IdTokenChangedListenerRegistration(Firebase.Auth.FirebaseAuth instance, IdTokenChangedHandler handler)
             {
                 _instance = instance;
                 _listener = new IdTokenListener(handler);
                 _instance.AddIdTokenListener(_listener);
+            }
+
+            public void Dispose()
+            {
+                Remove();
             }
 
             public void Remove()
@@ -352,7 +402,7 @@ namespace Plugin.FirebaseAuth
 
                 public void OnIdTokenChanged(Firebase.Auth.FirebaseAuth auth)
                 {
-                    _handler?.Invoke(auth == null ? null : AuthProvider.GetAuth(auth));
+                    _handler?.Invoke(AuthProvider.GetAuth(auth));
                 }
             }
         }

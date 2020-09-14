@@ -5,10 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="4.6.0.726" />
+    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1364" />
     <PackageReference Include="Prism.DryIoc.Forms" Version="7.2.0.1422" />
-    <PackageReference Include="ReactiveProperty" Version="6.2.0" />
-    <PackageReference Include="Xamarin.Auth" Version="1.7.0" />
+    <PackageReference Include="ReactiveProperty" Version="7.2.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,8 +15,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Extensins\" />
-    <Folder Include="Auth\" />
     <Folder Include="Converters\" />
+    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ViewModels\TwitterAuthPageViewModel.cs" />

@@ -3,8 +3,8 @@ namespace Plugin.FirebaseAuth
 {
     public class UserProfileChangeRequest
     {
-        private string _displayName;
-        public string DisplayName
+        private string? _displayName;
+        public string? DisplayName
         {
             get => _displayName;
             set
@@ -14,8 +14,8 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        private Uri _photoUrl;
-        public Uri PhotoUrl
+        private Uri? _photoUrl;
+        public Uri? PhotoUrl
         {
             get => _photoUrl;
             set

@@ -7,16 +7,16 @@ using System.Linq;
 using System.Text;
 using Reactive.Bindings;
 using Xamarin.Forms;
-using Xamarin.Auth;
 using System.Threading.Tasks;
-using Plugin.FirebaseAuth.Sample.Auth;
 using Prism.Services;
 using DryIoc;
 using Plugin.FirebaseAuth.Sample.Extensins;
+using Plugin.FirebaseAuth.Sample.Services;
+using Prism.Ioc;
 
 namespace Plugin.FirebaseAuth.Sample.ViewModels
 {
-    public class MainPageViewModel : ViewModelBase
+    public class MainPageViewModel : ViewModelBase, IVerificationCodeGettable
     {
         public AsyncReactiveCommand SignUpCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand SignInWithEmailAndPasswordCommand { get; } = new AsyncReactiveCommand();
@@ -24,6 +24,9 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         public AsyncReactiveCommand SignInWithTwitterCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand SignInWithFacebookCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand SignInWithGitHubCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand SignInWithYahooCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand SignInWithMicrosoftCommand { get; } = new AsyncReactiveCommand();
+        public AsyncReactiveCommand SignInWithAppleCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand SignInWithPhoneNumberCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand SignInAnonymouslyCommand { get; } = new AsyncReactiveCommand();
         public AsyncReactiveCommand ShowUserCommand { get; }
@@ -31,13 +34,20 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         private readonly IPageDialogService _pageDialogService;
         private ReactivePropertySlim<bool> _isSignedIn = new ReactivePropertySlim<bool>();
         private IListenerRegistration _registration;
-        private IAuthService _authService;
+        private readonly IGoogleService _googleService;
+        private readonly IFacebookService _facebookService;
+        private readonly IAppleService _appleService;
+        private readonly MultiFactorService _multiFactorService;
 
-        public MainPageViewModel(INavigationService navigationService, IPageDialogService pageDialogService, IAuthService authService)
+        public MainPageViewModel(INavigationService navigationService, IPageDialogService pageDialogService, IGoogleService googleService, IFacebookService facebookService, IAppleService appleService)
             : base(navigationService)
         {
             _pageDialogService = pageDialogService;
-            _authService = authService;
+            _googleService = googleService;
+            _facebookService = facebookService;
+            _appleService = appleService;
+
+            _multiFactorService = new MultiFactorService(this);
 
             Title = "Main Page";
 
@@ -51,9 +61,12 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
             SignUpCommand.Subscribe(SignUp);
             SignInWithEmailAndPasswordCommand.Subscribe(SignInWithEmailAndPassword);
             SignInWithGoogleCommand.Subscribe(SignInWithGoogle);
-            SignInWithTwitterCommand.Subscribe(SignInWithTwitter);
+            SignInWithTwitterCommand.Subscribe(() => SignInWithProvider("twitter.com"));
             SignInWithFacebookCommand.Subscribe(SignInWithFacebook);
-            SignInWithGitHubCommand.Subscribe(SignInWithGitHub);
+            SignInWithGitHubCommand.Subscribe(() => SignInWithProvider("github.com"));
+            SignInWithYahooCommand.Subscribe(() => SignInWithProvider("yahoo.com"));
+            SignInWithMicrosoftCommand.Subscribe(() => SignInWithProvider("microsoft.com"));
+            SignInWithAppleCommand.Subscribe(SignInWithApple);
             SignInWithPhoneNumberCommand.Subscribe(SignInWithPhoneNumber);
             SignInAnonymouslyCommand.Subscribe(SignInSignInAnonymously);
             ShowUserCommand.Subscribe(async () => await NavigationService.NavigateAsync<UserPageViewModel>());
@@ -90,43 +103,19 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         {
             try
             {
-                var (idToken, accessToken) = await _authService.LoginWithGoogle();
+                var (idToken, accessToken) = await _googleService.GetCredentialAsync();
 
-                if (idToken != null)
-                {
-                    var credential = CrossFirebaseAuth.Current
-                                                      .GoogleAuthProvider
-                                                      .GetCredential(idToken, accessToken);
+                var credential = CrossFirebaseAuth.Current
+                    .GoogleAuthProvider
+                    .GetCredential(idToken, accessToken);
 
-                    var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
+                var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
 
-                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
-                }
+                await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
             }
-            catch (Exception e)
+            catch (FirebaseAuthException e)
             {
-                System.Diagnostics.Debug.WriteLine(e);
-
-                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
-            }
-        }
-
-        private async Task SignInWithTwitter()
-        {
-            try
-            {
-                var (token, secret) = await _authService.LoginWithTwitter();
-
-                if (token != null && secret != null)
-                {
-                    var credential = CrossFirebaseAuth.Current
-                                                      .TwitterAuthProvider
-                                                      .GetCredential(token, secret);
-
-                    var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
-
-                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
-                }
+                await ResolveAsync(e);
             }
             catch (Exception e)
             {
@@ -140,18 +129,19 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
         {
             try
             {
-                var accessToken = await _authService.LoginWithFacebook();
+                var accessToken = await _facebookService.GetCredentialAsync();
 
-                if (accessToken != null)
-                {
-                    var credential = CrossFirebaseAuth.Current
-                                                      .FacebookAuthProvider
-                                                      .GetCredential(accessToken);
+                var credential = CrossFirebaseAuth.Current
+                    .FacebookAuthProvider
+                    .GetCredential(accessToken);
 
-                    var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
+                var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
 
-                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
-                }
+                await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+            }
+            catch (FirebaseAuthException e)
+            {
+                await ResolveAsync(e);
             }
             catch (Exception e)
             {
@@ -161,22 +151,57 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
             }
         }
 
-        private async Task SignInWithGitHub()
+        private async Task SignInWithApple()
         {
             try
             {
-                var token = await _authService.LoginWithGitHub();
+                IAuthResult result;
 
-                if (token != null)
+                var (idToken, rawNonce) = await _appleService.GetCredentialAsync();
+                if (idToken != null)
                 {
-                    var credential = CrossFirebaseAuth.Current
-                                                      .GitHubAuthProvider
-                                                      .GetCredential(token);
+                    var credential = CrossFirebaseAuth.Current.OAuthProvider
+                        .GetCredential("apple.com", idToken, rawNonce: rawNonce);
 
-                    var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
-
-                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+                    result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
                 }
+                else
+                {
+                    var porvider = new OAuthProvider("apple.com")
+                    {
+                        Scopes = new[] { "email", "name" }
+                    };
+
+                    result = await CrossFirebaseAuth.Current.Instance.SignInWithProviderAsync(porvider);
+                }
+
+                await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+            }
+            catch (FirebaseAuthException e)
+            {
+                await ResolveAsync(e);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+
+                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
+            }
+        }
+
+        private async Task SignInWithProvider(string providerId)
+        {
+            try
+            {
+                var porvider = new OAuthProvider(providerId);
+
+                var result = await CrossFirebaseAuth.Current.Instance.SignInWithProviderAsync(porvider);
+
+                await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+            }
+            catch (FirebaseAuthException e)
+            {
+                await ResolveAsync(e);
             }
             catch (Exception e)
             {
@@ -188,11 +213,26 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
         private async Task SignInWithPhoneNumber()
         {
-            var result = await NavigationService.NavigateAsync<SignInWithPhoneNumberPageViewModel, IAuthResult>();
-
-            if (result != null)
+            try
             {
-                await _pageDialogService.DisplayAlertAsync("Success", result.User.PhoneNumber, "OK");
+                var credential = await NavigationService.NavigateAsync<SignInWithPhoneNumberPageViewModel, IMultiFactorSession, IPhoneAuthCredential>(null);
+
+                if (credential != null)
+                {
+                    var result = await CrossFirebaseAuth.Current.Instance.SignInWithCredentialAsync(credential);
+
+                    await _pageDialogService.DisplayAlertAsync("Success", result.User.PhoneNumber, "OK");
+                }
+            }
+            catch (FirebaseAuthException e)
+            {
+                await ResolveAsync(e);
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(e);
+
+                await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
             }
         }
 
@@ -210,6 +250,36 @@ namespace Plugin.FirebaseAuth.Sample.ViewModels
 
                 await _pageDialogService.DisplayAlertAsync("Failure", e.Message, "OK");
             }
+        }
+
+        private async Task ResolveAsync(FirebaseAuthException firebaseAuthException)
+        {
+            if (firebaseAuthException.Resolver == null)
+            {
+                System.Diagnostics.Debug.WriteLine(firebaseAuthException);
+
+                await _pageDialogService.DisplayAlertAsync("Failure", firebaseAuthException.Message, "OK");
+            }
+            else
+            {
+                try
+                {
+                    var result = await _multiFactorService.ResolveAsync(firebaseAuthException.Resolver);
+
+                    await _pageDialogService.DisplayAlertAsync("Success", result.User.DisplayName, "OK");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex);
+
+                    await _pageDialogService.DisplayAlertAsync("Failure", ex.Message, "OK");
+                }
+            }
+        }
+
+        public Task<string> GetVerificationCodeAsync()
+        {
+            return NavigationService.NavigateAsync<VerificationCodePageViewModel, string>();
         }
     }
 }

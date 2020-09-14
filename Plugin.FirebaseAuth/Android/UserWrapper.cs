@@ -4,32 +4,29 @@ using System.Linq;
 using System.Threading.Tasks;
 using Firebase.Auth;
 using Firebase;
+using Android.Gms.Extensions;
+using Plugin.CurrentActivity;
 
 namespace Plugin.FirebaseAuth
 {
-    public class UserWrapper : IUser
+    public class UserWrapper : IUser, IEquatable<UserWrapper>
     {
         private readonly FirebaseUser _user;
 
         public UserWrapper(FirebaseUser user)
         {
-            _user = user;
+            _user = user ?? throw new ArgumentNullException(nameof(user));
         }
 
-        public static explicit operator FirebaseUser(UserWrapper wrapper)
-        {
-            return wrapper._user;
-        }
+        public string? DisplayName => _user.DisplayName;
 
-        public string DisplayName => _user.DisplayName;
-
-        public string Email => _user.Email;
+        public string? Email => _user.Email;
 
         public bool IsAnonymous => _user.IsAnonymous;
 
-        public string PhoneNumber => _user.PhoneNumber;
+        public string? PhoneNumber => _user.PhoneNumber;
 
-        public Uri PhotoUrl => _user.PhotoUrl != null ? new Uri(_user.PhotoUrl.ToString()) : null;
+        public Uri? PhotoUrl => _user.PhotoUrl != null ? new Uri(_user.PhotoUrl.ToString()) : null;
 
         public IEnumerable<IUserInfo> ProviderData => _user.ProviderData.Select(userInfo => new UserInfoWrapper(userInfo));
 
@@ -39,7 +36,9 @@ namespace Plugin.FirebaseAuth
 
         public bool IsEmailVerified => _user.IsEmailVerified;
 
-        public IUserMetadata Metadata => _user.Metadata != null ? new UserMetadataWrapper(_user.Metadata) : null;
+        public IUserMetadata? Metadata => _user.Metadata != null ? new UserMetadataWrapper(_user.Metadata) : null;
+
+        public IMultiFactor MultiFactor => new MultiFactorWrapper(_user.MultiFactor);
 
         public async Task DeleteAsync()
         {
@@ -53,12 +52,25 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task<string> GetIdTokenAsync(bool forceRefresh)
+        public async Task<string?> GetIdTokenAsync(bool forceRefresh)
         {
             try
             {
-                var result = await _user.GetIdTokenAsync(forceRefresh).ConfigureAwait(false);
+                var result = await _user.GetIdToken(forceRefresh).AsAsync<GetTokenResult>().ConfigureAwait(false);
                 return result.Token;
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public async Task<IAuthTokenResult> GetIdTokenResultAsync(bool forceRefresh)
+        {
+            try
+            {
+                var result = await _user.GetIdToken(forceRefresh).AsAsync<GetTokenResult>().ConfigureAwait(false);
+                return new AuthTokenResultWrapper(result);
             }
             catch (FirebaseException e)
             {
@@ -70,8 +82,36 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var wrapper = (AuthCredentialWrapper)credential;
-                var result = await _user.LinkWithCredentialAsync((AuthCredential)wrapper).ConfigureAwait(false);
+                var result = await _user.LinkWithCredentialAsync(credential.ToNative()).ConfigureAwait(false);
+                return new AuthResultWrapper(result);
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public async Task<IAuthResult> LinkWithProviderAsync(IFederatedAuthProvider federatedAuthProvider)
+        {
+            var activity = CrossCurrentActivity.Current.Activity ?? throw new NullReferenceException("current activity is null");
+
+            try
+            {
+                Firebase.Auth.IAuthResult result;
+
+                var auth = Firebase.Auth.FirebaseAuth.GetInstance(_user.Zzc());
+                var pendingResultTask = auth.GetPendingAuthResult();
+
+                if (pendingResultTask != null)
+                {
+                    result = await pendingResultTask.AsAsync<Firebase.Auth.IAuthResult>().ConfigureAwait(false);
+                }
+                else
+                {
+                    result = await _user.StartActivityForLinkWithProvider(activity, federatedAuthProvider.ToNative()).AsAsync<Firebase.Auth.IAuthResult>()
+                        .ConfigureAwait(false);
+                }
+
                 return new AuthResultWrapper(result);
             }
             catch (FirebaseException e)
@@ -84,9 +124,49 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var wrapper = (AuthCredentialWrapper)credential;
-                var result = await _user.ReauthenticateAndRetrieveDataAsync((AuthCredential)wrapper).ConfigureAwait(false);
+                var result = await _user.ReauthenticateAndRetrieveDataAsync(credential.ToNative()).ConfigureAwait(false);
                 return new AuthResultWrapper(result);
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public async Task<IAuthResult> ReauthenticateWithProviderAsync(IFederatedAuthProvider federatedAuthProvider)
+        {
+            var activity = CrossCurrentActivity.Current.Activity ?? throw new NullReferenceException("current activity is null");
+
+            try
+            {
+                Firebase.Auth.IAuthResult result;
+
+                var auth = Firebase.Auth.FirebaseAuth.GetInstance(_user.Zzc());
+                var pendingResultTask = auth.GetPendingAuthResult();
+
+                if (pendingResultTask != null)
+                {
+                    result = await pendingResultTask.AsAsync<Firebase.Auth.IAuthResult>().ConfigureAwait(false);
+                }
+                else
+                {
+                    result = await _user.StartActivityForReauthenticateWithProvider(activity, federatedAuthProvider.ToNative()).AsAsync<Firebase.Auth.IAuthResult>()
+                        .ConfigureAwait(false);
+                }
+
+                return new AuthResultWrapper(result);
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public async Task ReauthenticateAsync(IAuthCredential credential)
+        {
+            try
+            {
+                await _user.ReauthenticateAsync(credential.ToNative()).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -171,8 +251,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var wrapper = (PhoneAuthCredentialWrapper)credential;
-                await _user.UpdatePhoneNumberAsync((PhoneAuthCredential)wrapper).ConfigureAwait(false);
+                await _user.UpdatePhoneNumberAsync(credential.ToNative()).ConfigureAwait(false);
             }
             catch (FirebaseException e)
             {
@@ -202,6 +281,54 @@ namespace Plugin.FirebaseAuth
             {
                 throw ExceptionMapper.Map(e);
             }
+        }
+
+        public async Task VerifyBeforeUpdateEmail(string newEmail)
+        {
+            try
+            {
+                await _user.VerifyBeforeUpdateEmail(newEmail).AsAsync().ConfigureAwait(false);
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public async Task VerifyBeforeUpdateEmail(string newEmail, ActionCodeSettings actionCodeSettings)
+        {
+            try
+            {
+                await _user.VerifyBeforeUpdateEmail(newEmail, actionCodeSettings.ToNative()).AsAsync().ConfigureAwait(false);
+            }
+            catch (FirebaseException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as UserWrapper);
+        }
+
+        public bool Equals(UserWrapper? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (GetType() != other.GetType()) return false;
+            if (ReferenceEquals(_user, other._user)) return true;
+            return _user.Equals(other._user);
+        }
+
+        public override int GetHashCode()
+        {
+            return _user.GetHashCode();
+        }
+
+        FirebaseUser IUser.ToNative()
+        {
+            return _user;
         }
     }
 }

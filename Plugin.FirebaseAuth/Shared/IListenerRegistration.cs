@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Plugin.FirebaseAuth
 {
-    public interface IListenerRegistration
+    public interface IListenerRegistration : IDisposable
     {
         void Remove();
     }

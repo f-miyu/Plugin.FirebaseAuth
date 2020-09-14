@@ -1,7 +1,7 @@
 ﻿using System;
 namespace Plugin.FirebaseAuth
 {
-    public interface IPhoneAuthCredential : IAuthCredential
+    public partial interface IPhoneAuthCredential : IAuthCredential
     {
     }
 }

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="MSBuild.Sdk.Extras/2.0.54">
     <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;Xamarin.iOS10;MonoAndroid90</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;Xamarin.iOS10;MonoAndroid90;MonoAndroid10.0</TargetFrameworks>
         <AssemblyName>Plugin.FirebaseAuth</AssemblyName>
         <RootNamespace>Plugin.FirebaseAuth</RootNamespace>
         <PackageId>Plugin.FirebaseAuth</PackageId>
         <Product>$(AssemblyName) ($(TargetFramework))</Product>
-        <Version>3.1.0</Version>
-        <PackageVersion>3.1.0</PackageVersion>
+        <Version>4.0.0-pre01</Version>
+        <PackageVersion>4.0.0-pre01</PackageVersion>
         <PackOnBuild>true</PackOnBuild>
         <NeutralLanguage>en</NeutralLanguage>
         <LangVersion>default</LangVersion>
@@ -26,6 +26,7 @@
         <Authors>f-miyu</Authors>
         <Copyright>Copyright (c) 2018 f-miyu</Copyright>
         <DisableExtraReferences>true</DisableExtraReferences>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)'=='Debug' ">
         <DebugSymbols>true</DebugSymbols>
@@ -42,14 +43,11 @@
     </ItemGroup>
     <ItemGroup Condition=" $(TargetFramework.StartsWith('MonoAndroid')) ">
         <Compile Include="Android\**\*.cs" />
-        <PackageReference Include="Xamarin.Firebase.Auth" Version="71.1605.0" PrivateAssets="none" />
-        <PackageReference Include="Plugin.CurrentActivity" Version="2.1.0.4" PrivateAssets="none" />
+        <PackageReference Include="Plugin.CurrentActivity" Version="2.1.0.4" />
+        <PackageReference Include="Xamarin.Firebase.Auth" Version="119.3.1-preview02" PrivateAssets="contentFiles;analyzers" />
     </ItemGroup>
     <ItemGroup Condition=" $(TargetFramework.StartsWith('Xamarin.iOS')) ">
         <Compile Include="iOS\**\*.cs" />
-        <PackageReference Include="Xamarin.Firebase.iOS.Auth" Version="6.5.1" PrivateAssets="none" />
-    </ItemGroup>
-    <ItemGroup>
-        <None Include="build\Plugin.FirebaseAuth.targets" PackagePath="build\monoandroid90" Pack="true" />
+        <PackageReference Include="Xamarin.Firebase.iOS.Auth" Version="6.5.1" />
     </ItemGroup>
 </Project>

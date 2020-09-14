@@ -2,25 +2,44 @@
 
 namespace Plugin.FirebaseAuth
 {
-    public class UserInfoWrapper : IUserInfo
+    public class UserInfoWrapper : IUserInfo, IEquatable<UserInfoWrapper>
     {
         private readonly Firebase.Auth.IUserInfo _userInfo;
 
-        public string DisplayName => _userInfo.DisplayName;
+        public UserInfoWrapper(Firebase.Auth.IUserInfo userInfo)
+        {
+            _userInfo = userInfo ?? throw new ArgumentNullException(nameof(userInfo));
+        }
 
-        public string Email => _userInfo.Email;
+        public string? DisplayName => _userInfo.DisplayName;
 
-        public string PhoneNumber => _userInfo.PhoneNumber;
+        public string? Email => _userInfo.Email;
 
-        public Uri PhotoUrl => _userInfo.PhotoUrl != null ? new Uri(_userInfo.PhotoUrl.AbsoluteString) : null;
+        public string? PhoneNumber => _userInfo.PhoneNumber;
+
+        public Uri? PhotoUrl => _userInfo.PhotoUrl != null ? new Uri(_userInfo.PhotoUrl.AbsoluteString) : null;
 
         public string ProviderId => _userInfo.ProviderId;
 
         public string Uid => _userInfo.Uid;
 
-        public UserInfoWrapper(Firebase.Auth.IUserInfo userInfo)
+        public override bool Equals(object? obj)
         {
-            _userInfo = userInfo;
+            return Equals(obj as UserInfoWrapper);
+        }
+
+        public bool Equals(UserInfoWrapper? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (GetType() != other.GetType()) return false;
+            if (ReferenceEquals(_userInfo, other._userInfo)) return true;
+            return _userInfo.Equals(other._userInfo);
+        }
+
+        public override int GetHashCode()
+        {
+            return _userInfo.GetHashCode();
         }
     }
 }

@@ -5,33 +5,28 @@ using Foundation;
 
 namespace Plugin.FirebaseAuth
 {
-    public class AuthWrapper : IAuth
+    public class AuthWrapper : IAuth, IEquatable<AuthWrapper>
     {
-        public event EventHandler<AuthStateEventArgs> AuthState;
-
-        public event EventHandler<IdTokenEventArgs> IdToken;
-
-        public IUser CurrentUser => _auth.CurrentUser != null ? new UserWrapper(_auth.CurrentUser) : null;
-
-        public string LanguageCode
-        {
-            get => _auth.LanguageCode;
-            set => _auth.LanguageCode = value;
-        }
-
         private readonly Auth _auth;
-
-        public static explicit operator Auth(AuthWrapper wrapper)
-        {
-            return wrapper._auth;
-        }
 
         public AuthWrapper(Auth auth)
         {
-            _auth = auth;
+            _auth = auth ?? throw new ArgumentNullException(nameof(auth));
 
             _auth.AddAuthStateDidChangeListener(OnAuthStateChanged);
             _auth.AddIdTokenDidChangeListener(OnIdTokenChanged);
+        }
+
+        public event EventHandler<AuthStateEventArgs>? AuthState;
+
+        public event EventHandler<IdTokenEventArgs>? IdToken;
+
+        public IUser? CurrentUser => _auth.CurrentUser != null ? new UserWrapper(_auth.CurrentUser) : null;
+
+        public string? LanguageCode
+        {
+            get => _auth.LanguageCode;
+            set => _auth.LanguageCode = value;
         }
 
         public async Task<IAuthResult> CreateUserWithEmailAndPasswordAsync(string email, string password)
@@ -64,8 +59,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var wrapper = (AuthCredentialWrapper)credential;
-                var result = await _auth.SignInWithCredentialAsync((AuthCredential)wrapper).ConfigureAwait(false);
+                var result = await _auth.SignInWithCredentialAsync(credential.ToNative()).ConfigureAwait(false);
                 return new AuthResultWrapper(result);
             }
             catch (NSErrorException e)
@@ -106,18 +100,6 @@ namespace Plugin.FirebaseAuth
             {
                 var result = await _auth.SignInWithLinkAsync(email, link).ConfigureAwait(false);
                 return new AuthResultWrapper(result);
-            }
-            catch (NSErrorException e)
-            {
-                throw ExceptionMapper.Map(e);
-            }
-        }
-
-        public async Task<string[]> FetchProvidersForEmailAsync(string email)
-        {
-            try
-            {
-                return await _auth.FetchProvidersAsync(email).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -173,6 +155,35 @@ namespace Plugin.FirebaseAuth
             }
         }
 
+        public Task<IAuthResult> SignInWithProviderAsync(IFederatedAuthProvider federatedAuthProvider)
+        {
+            var tcs = new TaskCompletionSource<IAuthResult>();
+
+            federatedAuthProvider.ToNative().Completion(FirebaseAuth.SignInWithProviderAuthUIDelegate, (credential, error) =>
+            {
+                if (error != null)
+                {
+                    tcs.SetException(ExceptionMapper.Map(error));
+                }
+                else
+                {
+                    _auth.SignInWithCredential(credential, (result, error) =>
+                    {
+                        if (error != null)
+                        {
+                            tcs.SetException(ExceptionMapper.Map(error));
+                        }
+                        else
+                        {
+                            tcs.SetResult(new AuthResultWrapper(result));
+                        }
+                    });
+                }
+            });
+
+            return tcs.Task;
+        }
+
         public async Task ApplyActionCodeAsync(string code)
         {
             try
@@ -225,8 +236,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var wrapper = (UserWrapper)user;
-                await _auth.UpdateCurrentUserAsync((User)user).ConfigureAwait(false);
+                await _auth.UpdateCurrentUserAsync(user.ToNative()).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -264,28 +274,84 @@ namespace Plugin.FirebaseAuth
             return new IdTokenChangedListenerRegistration(_auth, listener);
         }
 
+        public void UseUserAccessGroup(string? accessGroup)
+        {
+            _auth.UseUserAccessGroup(accessGroup, out var error);
+
+            if (error != null)
+            {
+                throw ExceptionMapper.Map(error);
+            }
+        }
+
+        public IUser? GetStoredUser(string? accessGroup)
+        {
+            var user = _auth.GetStoredUser(accessGroup, out var error);
+
+            if (error != null)
+            {
+                throw ExceptionMapper.Map(error);
+            }
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return new UserWrapper(user);
+        }
+
         private void OnAuthStateChanged(Auth auth, User user)
         {
-            AuthState?.Invoke(this, new AuthStateEventArgs(auth == null ? null : AuthProvider.GetAuth(auth)));
+            AuthState?.Invoke(this, new AuthStateEventArgs(AuthProvider.GetAuth(auth)));
         }
 
         private void OnIdTokenChanged(Auth auth, User user)
         {
-            IdToken?.Invoke(this, new IdTokenEventArgs(auth == null ? null : AuthProvider.GetAuth(auth)));
+            IdToken?.Invoke(this, new IdTokenEventArgs(AuthProvider.GetAuth(auth)));
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as AuthWrapper);
+        }
+
+        public bool Equals(AuthWrapper? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (GetType() != other.GetType()) return false;
+            if (ReferenceEquals(_auth, other._auth)) return true;
+            return _auth.Equals(other._auth);
+        }
+
+        public override int GetHashCode()
+        {
+            return _auth.GetHashCode();
+        }
+
+        Auth IAuth.ToNative()
+        {
+            return _auth;
         }
 
         private class AuthStateChangedListenerRegistration : IListenerRegistration
         {
             private readonly Auth _instance;
-            private NSObject _listner;
+            private NSObject? _listner;
 
             public AuthStateChangedListenerRegistration(Auth instance, AuthStateChangedHandler handler)
             {
                 _instance = instance;
-                _listner = _instance.AddAuthStateDidChangeListener((Auth auth, User user) =>
+                _listner = _instance.AddAuthStateDidChangeListener((Auth auth, User? user) =>
                 {
-                    handler?.Invoke(auth == null ? null : AuthProvider.GetAuth(auth));
+                    handler?.Invoke(AuthProvider.GetAuth(auth));
                 });
+            }
+
+            public void Dispose()
+            {
+                Remove();
             }
 
             public void Remove()
@@ -301,15 +367,20 @@ namespace Plugin.FirebaseAuth
         private class IdTokenChangedListenerRegistration : IListenerRegistration
         {
             private readonly Auth _instance;
-            private NSObject _listner;
+            private NSObject? _listner;
 
             public IdTokenChangedListenerRegistration(Auth instance, IdTokenChangedHandler handler)
             {
                 _instance = instance;
-                _listner = _instance.AddIdTokenDidChangeListener((Auth auth, User user) =>
+                _listner = _instance.AddIdTokenDidChangeListener((Auth auth, User? user) =>
                 {
-                    handler?.Invoke(auth == null ? null : AuthProvider.GetAuth(auth));
+                    handler?.Invoke(AuthProvider.GetAuth(auth));
                 });
+            }
+
+            public void Dispose()
+            {
+                Remove();
             }
 
             public void Remove()

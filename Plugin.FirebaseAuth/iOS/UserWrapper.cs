@@ -7,29 +7,24 @@ using Foundation;
 
 namespace Plugin.FirebaseAuth
 {
-    public class UserWrapper : IUser
+    public class UserWrapper : IUser, IEquatable<UserWrapper>
     {
         private readonly User _user;
 
         public UserWrapper(User user)
         {
-            _user = user;
+            _user = user ?? throw new ArgumentNullException(nameof(user));
         }
 
-        public static explicit operator User(UserWrapper wrapper)
-        {
-            return wrapper._user;
-        }
+        public string? DisplayName => _user.DisplayName;
 
-        public string DisplayName => _user.DisplayName;
-
-        public string Email => _user.Email;
+        public string? Email => _user.Email;
 
         public bool IsAnonymous => _user.IsAnonymous;
 
-        public string PhoneNumber => _user.PhoneNumber;
+        public string? PhoneNumber => _user.PhoneNumber;
 
-        public Uri PhotoUrl => _user.PhotoUrl != null ? new Uri(_user.PhotoUrl.AbsoluteString) : null;
+        public Uri? PhotoUrl => _user.PhotoUrl != null ? new Uri(_user.PhotoUrl.AbsoluteString) : null;
 
         public IEnumerable<IUserInfo> ProviderData => _user.ProviderData.Select(userInfo => new UserInfoWrapper(userInfo));
 
@@ -39,7 +34,11 @@ namespace Plugin.FirebaseAuth
 
         public bool IsEmailVerified => _user.IsEmailVerified;
 
-        public IUserMetadata Metadata => _user.Metadata != null ? new UserMetadataWrapper(_user.Metadata) : null;
+        public IUserMetadata? Metadata =>
+            _user.Metadata != null && _user.Metadata.CreationDate != null && _user.Metadata.LastSignInDate != null
+            ? new UserMetadataWrapper(_user.Metadata) : null;
+
+        public IMultiFactor MultiFactor => new MultiFactorWrapper(_user.MultiFactor);
 
         public async Task DeleteAsync()
         {
@@ -53,7 +52,7 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task<string> GetIdTokenAsync(bool forceRefresh)
+        public async Task<string?> GetIdTokenAsync(bool forceRefresh)
         {
             try
             {
@@ -65,12 +64,24 @@ namespace Plugin.FirebaseAuth
             }
         }
 
+        public async Task<IAuthTokenResult> GetIdTokenResultAsync(bool forceRefresh)
+        {
+            try
+            {
+                var result = await _user.GetIdTokenResultAsync(forceRefresh).ConfigureAwait(false);
+                return new AuthTokenResultWrapper(result);
+            }
+            catch (NSErrorException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
         public async Task<IAuthResult> LinkWithCredentialAsync(IAuthCredential credential)
         {
             try
             {
-                var wrapper = (AuthCredentialWrapper)credential;
-                var result = await _user.LinkAsync((AuthCredential)wrapper).ConfigureAwait(false);
+                var result = await _user.LinkAsync(credential.ToNative()).ConfigureAwait(false);
                 return new AuthResultWrapper(result);
             }
             catch (NSErrorException e)
@@ -79,13 +90,82 @@ namespace Plugin.FirebaseAuth
             }
         }
 
+        public Task<IAuthResult> LinkWithProviderAsync(IFederatedAuthProvider federatedAuthProvider)
+        {
+            var tcs = new TaskCompletionSource<IAuthResult>();
+
+            federatedAuthProvider.ToNative().Completion(FirebaseAuth.LinkWithProviderAuthUIDelegate, (credential, error) =>
+            {
+                if (error != null)
+                {
+                    tcs.SetException(ExceptionMapper.Map(error));
+                }
+                else
+                {
+                    _user.Link(credential, (result, error) =>
+                    {
+                        if (error != null)
+                        {
+                            tcs.SetException(ExceptionMapper.Map(error));
+                        }
+                        else
+                        {
+                            tcs.SetResult(new AuthResultWrapper(result));
+                        }
+                    });
+                }
+            });
+
+            return tcs.Task;
+        }
+
         public async Task<IAuthResult> ReauthenticateAndRetrieveDataAsync(IAuthCredential credential)
         {
             try
             {
-                var wrapper = (AuthCredentialWrapper)credential;
-                var result = await _user.ReauthenticateAndRetrieveDataAsync((AuthCredential)wrapper).ConfigureAwait(false);
+                var result = await _user.ReauthenticateAndRetrieveDataAsync(credential.ToNative()).ConfigureAwait(false);
                 return new AuthResultWrapper(result);
+            }
+            catch (NSErrorException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public Task<IAuthResult> ReauthenticateWithProviderAsync(IFederatedAuthProvider federatedAuthProvider)
+        {
+            var tcs = new TaskCompletionSource<IAuthResult>();
+
+            federatedAuthProvider.ToNative().Completion(FirebaseAuth.ReauthenticateWithProviderAuthUIDelegate, (credential, error) =>
+            {
+                if (error != null)
+                {
+                    tcs.SetException(ExceptionMapper.Map(error));
+                }
+                else
+                {
+                    _user.ReauthenticateAndRetrieveData(credential, (result, error) =>
+                    {
+                        if (error != null)
+                        {
+                            tcs.SetException(ExceptionMapper.Map(error));
+                        }
+                        else
+                        {
+                            tcs.SetResult(new AuthResultWrapper(result));
+                        }
+                    });
+                }
+            });
+
+            return tcs.Task;
+        }
+
+        public async Task ReauthenticateAsync(IAuthCredential credential)
+        {
+            try
+            {
+                await _user.ReauthenticateAsync(credential.ToNative()).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -170,8 +250,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                var wrapper = (PhoneAuthCredentialWrapper)credential;
-                await _user.UpdatePhoneNumberCredentialAsync((PhoneAuthCredential)wrapper).ConfigureAwait(false);
+                await _user.UpdatePhoneNumberCredentialAsync(credential.ToNative()).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -199,6 +278,54 @@ namespace Plugin.FirebaseAuth
             {
                 throw ExceptionMapper.Map(e);
             }
+        }
+
+        public async Task VerifyBeforeUpdateEmail(string newEmail)
+        {
+            try
+            {
+                await _user.SendEmailVerificationBeforeUpdatingEmailAsync(newEmail).ConfigureAwait(false);
+            }
+            catch (NSErrorException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public async Task VerifyBeforeUpdateEmail(string newEmail, ActionCodeSettings actionCodeSettings)
+        {
+            try
+            {
+                await _user.SendEmailVerificationBeforeUpdatingEmailAsync(newEmail, actionCodeSettings.ToNative()).ConfigureAwait(false);
+            }
+            catch (NSErrorException e)
+            {
+                throw ExceptionMapper.Map(e);
+            }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as UserWrapper);
+        }
+
+        public bool Equals(UserWrapper? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (GetType() != other.GetType()) return false;
+            if (ReferenceEquals(_user, other._user)) return true;
+            return _user.Equals(other._user);
+        }
+
+        public override int GetHashCode()
+        {
+            return _user.GetHashCode();
+        }
+
+        User IUser.ToNative()
+        {
+            return _user;
         }
     }
 }
