@@ -226,7 +226,7 @@ await CrossFirebaseAuth.Current.Instance.ConfirmPasswordResetAsync(code, newPass
 
 Recover email
 ```C#
-await CrossFirebaseAuth.Current.Instance.CheckActionCodeAsync(code);
+var info = await CrossFirebaseAuth.Current.Instance.CheckActionCodeAsync(code);
 await CrossFirebaseAuth.Current.Instance.ApplyActionCodeAsync(code);
 ```
 
