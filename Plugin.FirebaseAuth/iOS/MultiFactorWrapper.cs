@@ -30,7 +30,7 @@ namespace Plugin.FirebaseAuth
                 }
                 else
                 {
-                    tcs.SetResult(new MultiFactorSessionWrapper(session));
+                    tcs.SetResult(new MultiFactorSessionWrapper(session!));
                 }
             });
 

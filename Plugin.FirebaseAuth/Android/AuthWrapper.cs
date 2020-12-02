@@ -199,11 +199,12 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task CheckActionCodeAsync(string code)
+        public async Task<IActionCodeInfo> CheckActionCodeAsync(string code)
         {
             try
             {
-                await _auth.CheckActionCodeAsync(code).ConfigureAwait(false);
+                var result = await _auth.CheckActionCode(code).AsAsync<IActionCodeResult>().ConfigureAwait(false);
+                return new ActionCodeResultWrapper(result);
             }
             catch (FirebaseException e)
             {

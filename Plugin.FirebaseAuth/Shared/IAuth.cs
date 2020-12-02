@@ -24,7 +24,7 @@ namespace Plugin.FirebaseAuth
         Task SendPasswordResetEmailAsync(string email, ActionCodeSettings actionCodeSettings);
         Task SendSignInLinkToEmailAsync(string email, ActionCodeSettings actionCodeSettings);
         Task ApplyActionCodeAsync(string code);
-        Task CheckActionCodeAsync(string code);
+        Task<IActionCodeInfo> CheckActionCodeAsync(string code);
         Task ConfirmPasswordResetAsync(string code, string newPassword);
         Task<string> VerifyPasswordResetCodeAsync(string code);
         Task UpdateCurrentUserAsync(IUser user);

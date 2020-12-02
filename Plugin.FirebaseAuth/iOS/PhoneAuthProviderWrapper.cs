@@ -13,7 +13,7 @@ namespace Plugin.FirebaseAuth
 
         public IPhoneAuthCredential GetCredential(string verificationId, string verificationCode)
         {
-            return GetCredential(Auth.DefaultInstance, verificationId, verificationCode);
+            return GetCredential(Auth.DefaultInstance!, verificationId, verificationCode);
         }
 
         public IPhoneAuthCredential GetCredential(IAuth auth, string verificationId, string verificationCode)
@@ -29,12 +29,12 @@ namespace Plugin.FirebaseAuth
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(string phoneNumber)
         {
-            return VerifyPhoneNumberAsync(Auth.DefaultInstance, phoneNumber);
+            return VerifyPhoneNumberAsync(Auth.DefaultInstance!, phoneNumber);
         }
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(string phoneNumber, TimeSpan timeout)
         {
-            return VerifyPhoneNumberAsync(Auth.DefaultInstance, phoneNumber);
+            return VerifyPhoneNumberAsync(Auth.DefaultInstance!, phoneNumber);
         }
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber)
@@ -49,22 +49,22 @@ namespace Plugin.FirebaseAuth
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(string phoneNumber, IMultiFactorSession multiFactorSession)
         {
-            return VerifyPhoneNumberAsync(Auth.DefaultInstance, phoneNumber, multiFactorSession);
+            return VerifyPhoneNumberAsync(Auth.DefaultInstance!, phoneNumber, multiFactorSession);
         }
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(string phoneNumber, IMultiFactorSession multiFactorSession, TimeSpan timeout, bool requiresSmsValidation)
         {
-            return VerifyPhoneNumberAsync(Auth.DefaultInstance, phoneNumber, multiFactorSession);
+            return VerifyPhoneNumberAsync(Auth.DefaultInstance!, phoneNumber, multiFactorSession);
         }
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IPhoneMultiFactorInfo phoneMultiFactorInfo, IMultiFactorSession multiFactorSession)
         {
-            return VerifyPhoneNumberAsync(Auth.DefaultInstance, phoneMultiFactorInfo, multiFactorSession);
+            return VerifyPhoneNumberAsync(Auth.DefaultInstance!, phoneMultiFactorInfo, multiFactorSession);
         }
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IPhoneMultiFactorInfo phoneMultiFactorInfo, IMultiFactorSession multiFactorSession, TimeSpan timeout, bool requiresSmsValidation)
         {
-            return VerifyPhoneNumberAsync(Auth.DefaultInstance, phoneMultiFactorInfo, multiFactorSession);
+            return VerifyPhoneNumberAsync(Auth.DefaultInstance!, phoneMultiFactorInfo, multiFactorSession);
         }
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberAsync(IAuth auth, string phoneNumber, IMultiFactorSession multiFactorSession)
@@ -89,12 +89,12 @@ namespace Plugin.FirebaseAuth
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(string phoneNumber, string verificationCode)
         {
-            return VerifyPhoneNumberForTestingAsync(Auth.DefaultInstance, phoneNumber, verificationCode, default);
+            return VerifyPhoneNumberForTestingAsync(Auth.DefaultInstance!, phoneNumber, verificationCode, default);
         }
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(string phoneNumber, string verificationCode, TimeSpan timeout)
         {
-            return VerifyPhoneNumberForTestingAsync(Auth.DefaultInstance, phoneNumber, verificationCode, timeout);
+            return VerifyPhoneNumberForTestingAsync(Auth.DefaultInstance!, phoneNumber, verificationCode, timeout);
         }
 
         public Task<PhoneNumberVerificationResult> VerifyPhoneNumberForTestingAsync(IAuth auth, string phoneNumber, string verificationCode)
@@ -111,7 +111,10 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                auth.Settings.AppVerificationDisabledForTesting = false;
+                if (auth.Settings != null)
+                {
+                    auth.Settings.AppVerificationDisabledForTesting = false;
+                }
 
                 var verificationId = await PhoneAuthProvider.Create(auth)
                     .VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate)
@@ -129,7 +132,10 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                auth.Settings.AppVerificationDisabledForTesting = false;
+                if (auth.Settings != null)
+                {
+                    auth.Settings.AppVerificationDisabledForTesting = false;
+                }
 
                 var verificationId = await PhoneAuthProvider.Create(auth)
                     .VerifyPhoneNumberAsync(phoneNumber, FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate, multiFactorSession.ToNative())
@@ -147,7 +153,10 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                auth.Settings.AppVerificationDisabledForTesting = false;
+                if (auth.Settings != null)
+                {
+                    auth.Settings.AppVerificationDisabledForTesting = false;
+                }
 
                 var verificationId = await PhoneAuthProvider.Create(auth)
                     .VerifyPhoneNumberAsync(phoneMultiFactorInfo.ToNative(), FirebaseAuth.VerifyingPhoneNumberAuthUIDelegate, multiFactorSession.ToNative())
@@ -165,6 +174,10 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
+                if (auth.Settings == null)
+                {
+                    auth.Settings = new AuthSettings();
+                }
                 auth.Settings.AppVerificationDisabledForTesting = true;
 
                 var verificationId = await PhoneAuthProvider.Create(auth)
