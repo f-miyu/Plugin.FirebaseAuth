@@ -143,13 +143,13 @@
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1560" />
+    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1687" />
     <PackageReference Include="Prism.DryIoc.Forms" Version="8.0.0.1909" />
     <PackageReference Include="ReactiveProperty">
       <Version>7.5.1</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Firebase.iOS.Auth">
-      <Version>6.5.1</Version>
+      <Version>6.9.2</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Facebook.iOS">
       <Version>7.1.1</Version>

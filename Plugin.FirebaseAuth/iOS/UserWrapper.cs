@@ -102,7 +102,7 @@ namespace Plugin.FirebaseAuth
                 }
                 else
                 {
-                    _user.Link(credential, (result, error) =>
+                    _user.Link(credential!, (result, error) =>
                     {
                         if (error != null)
                         {
@@ -110,7 +110,7 @@ namespace Plugin.FirebaseAuth
                         }
                         else
                         {
-                            tcs.SetResult(new AuthResultWrapper(result));
+                            tcs.SetResult(new AuthResultWrapper(result!));
                         }
                     });
                 }
@@ -144,7 +144,7 @@ namespace Plugin.FirebaseAuth
                 }
                 else
                 {
-                    _user.ReauthenticateAndRetrieveData(credential, (result, error) =>
+                    _user.ReauthenticateAndRetrieveData(credential!, (result, error) =>
                     {
                         if (error != null)
                         {
@@ -152,7 +152,7 @@ namespace Plugin.FirebaseAuth
                         }
                         else
                         {
-                            tcs.SetResult(new AuthResultWrapper(result));
+                            tcs.SetResult(new AuthResultWrapper(result!));
                         }
                     });
                 }
@@ -201,7 +201,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await _user.SendEmailVerificationAsync(actionCodeSettings.ToNative()).ConfigureAwait(false);
+                await _user.SendEmailVerificationAsync(actionCodeSettings.ToNative()!).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -296,7 +296,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await _user.SendEmailVerificationBeforeUpdatingEmailAsync(newEmail, actionCodeSettings.ToNative()).ConfigureAwait(false);
+                await _user.SendEmailVerificationBeforeUpdatingEmailAsync(newEmail, actionCodeSettings.ToNative()!).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {

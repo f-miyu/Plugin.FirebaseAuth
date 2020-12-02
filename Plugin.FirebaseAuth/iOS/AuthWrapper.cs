@@ -135,7 +135,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await _auth.SendPasswordResetAsync(email, actionCodeSettings.ToNative()).ConfigureAwait(false);
+                await _auth.SendPasswordResetAsync(email, actionCodeSettings.ToNative()!).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -147,7 +147,7 @@ namespace Plugin.FirebaseAuth
         {
             try
             {
-                await _auth.SendSignInLinkAsync(email, actionCodeSettings.ToNative()).ConfigureAwait(false);
+                await _auth.SendSignInLinkAsync(email, actionCodeSettings.ToNative()!).ConfigureAwait(false);
             }
             catch (NSErrorException e)
             {
@@ -167,7 +167,7 @@ namespace Plugin.FirebaseAuth
                 }
                 else
                 {
-                    _auth.SignInWithCredential(credential, (result, error) =>
+                    _auth.SignInWithCredential(credential!, (result, error) =>
                     {
                         if (error != null)
                         {
@@ -175,7 +175,7 @@ namespace Plugin.FirebaseAuth
                         }
                         else
                         {
-                            tcs.SetResult(new AuthResultWrapper(result));
+                            tcs.SetResult(new AuthResultWrapper(result!));
                         }
                     });
                 }
@@ -196,11 +196,12 @@ namespace Plugin.FirebaseAuth
             }
         }
 
-        public async Task CheckActionCodeAsync(string code)
+        public async Task<IActionCodeInfo> CheckActionCodeAsync(string code)
         {
             try
             {
-                await _auth.CheckActionCodeAsync(code).ConfigureAwait(false);
+                var info = await _auth.CheckActionCodeAsync(code).ConfigureAwait(false);
+                return new ActionCodeInfoWrapper(info);
             }
             catch (NSErrorException e)
             {
@@ -301,12 +302,12 @@ namespace Plugin.FirebaseAuth
             return new UserWrapper(user);
         }
 
-        private void OnAuthStateChanged(Auth auth, User user)
+        private void OnAuthStateChanged(Auth auth, User? user)
         {
             AuthState?.Invoke(this, new AuthStateEventArgs(AuthProvider.GetAuth(auth)));
         }
 
-        private void OnIdTokenChanged(Auth auth, User user)
+        private void OnIdTokenChanged(Auth auth, User? user)
         {
             IdToken?.Invoke(this, new IdTokenEventArgs(AuthProvider.GetAuth(auth)));
         }

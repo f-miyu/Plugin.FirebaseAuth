@@ -21,7 +21,7 @@ namespace Plugin.FirebaseAuth
             }
             if (self.IsAndroidPackageChanged)
             {
-                actionCodeSettings.SetAndroidPackageName(self.AndroidPackageName,
+                actionCodeSettings.SetAndroidPackageName(self.AndroidPackageName!,
                                                          self.AndroidInstallIfNotAvailable,
                                                          self.AndroidMinimumVersion);
             }

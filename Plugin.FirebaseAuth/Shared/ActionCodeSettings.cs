@@ -45,7 +45,7 @@ namespace Plugin.FirebaseAuth
         internal bool IsIosBundleIdChanged { get; private set; }
         internal bool IsUrlChanged { get; private set; }
 
-        public void SetAndroidPackageName(string androidPackageName, bool installIfNotAvailable, string minimumVersion)
+        public void SetAndroidPackageName(string androidPackageName, bool installIfNotAvailable, string? minimumVersion)
         {
             AndroidPackageName = androidPackageName;
             AndroidInstallIfNotAvailable = installIfNotAvailable;
