@@ -99,7 +99,7 @@ namespace Plugin.FirebaseAuth
             {
                 Firebase.Auth.IAuthResult result;
 
-                var auth = Firebase.Auth.FirebaseAuth.GetInstance(_user.Zzc());
+                var auth = Firebase.Auth.FirebaseAuth.GetInstance(_user.Zza());
                 var pendingResultTask = auth.GetPendingAuthResult();
 
                 if (pendingResultTask != null)
@@ -141,7 +141,7 @@ namespace Plugin.FirebaseAuth
             {
                 Firebase.Auth.IAuthResult result;
 
-                var auth = Firebase.Auth.FirebaseAuth.GetInstance(_user.Zzc());
+                var auth = Firebase.Auth.FirebaseAuth.GetInstance(_user.Zza());
                 var pendingResultTask = auth.GetPendingAuthResult();
 
                 if (pendingResultTask != null)

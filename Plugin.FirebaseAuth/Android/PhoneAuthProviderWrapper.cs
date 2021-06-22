@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Firebase;
 using Firebase.Auth;
+using Java.Lang;
 using Java.Util.Concurrent;
 using Plugin.CurrentActivity;
 
@@ -112,9 +113,15 @@ namespace Plugin.FirebaseAuth
             var callbacks = new Callbacks(tcs);
 
             auth.FirebaseAuthSettings.SetAutoRetrievedSmsCodeForPhoneNumber(null, null);
-
-            PhoneAuthProvider.GetInstance(auth).VerifyPhoneNumber(phoneNumber, (long)timeout.TotalMilliseconds, TimeUnit.Milliseconds, activity, callbacks);
-
+            Long LongTimeout = new Long((long)timeout.TotalMilliseconds);
+            //PhoneAuthProvider.GetInstance(auth).VerifyPhoneNumber(phoneNumber, (long)timeout.TotalMilliseconds, TimeUnit.Milliseconds, activity, callbacks);
+            PhoneAuthOptions options = PhoneAuthOptions.NewBuilder(auth)
+                .SetPhoneNumber(phoneNumber)
+                .SetTimeout(LongTimeout, TimeUnit.Milliseconds)
+                .SetActivity(activity)
+                .SetCallbacks(callbacks)
+                .Build();
+            PhoneAuthProvider.VerifyPhoneNumber(options);
             return tcs.Task;
         }
 
