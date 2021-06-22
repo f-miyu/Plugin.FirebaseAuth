@@ -43,7 +43,7 @@
     <ItemGroup Condition=" $(TargetFramework.StartsWith('MonoAndroid')) ">
         <Compile Include="Android\**\*.cs" />
         <PackageReference Include="Plugin.CurrentActivity" Version="2.1.0.4" />
-        <PackageReference Include="Xamarin.Firebase.Auth" Version="119.3.1" PrivateAssets="contentFiles;analyzers" />
+        <PackageReference Include="Xamarin.Firebase.Auth" Version="121.0.1" PrivateAssets="contentFiles;analyzers" />
     </ItemGroup>
     <ItemGroup Condition=" $(TargetFramework.StartsWith('Xamarin.iOS')) ">
         <Compile Include="iOS\**\*.cs" />
